@@ -54,6 +54,14 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <includes>
+                    <include>*.csv</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
 </project>

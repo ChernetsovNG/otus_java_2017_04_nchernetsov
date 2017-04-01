@@ -4,9 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>nchernetsov.otus.ru</groupId>
-    <artifactId>HW1</artifactId>
+    <name>Otus-2017-04-HW01</name>
+    <description>Homework 01</description>
+
+    <developers>
+        <developer>
+            <name>Nikita Chernetsov</name>
+        </developer>
+    </developers>
+
+    <groupId>ru.otus.nchernetsov</groupId>
+    <artifactId>java-2017-04-HW1</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <net.sf.opencsv.version>2.3</net.sf.opencsv.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${net.sf.opencsv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+    </dependencies>
 
 </project>

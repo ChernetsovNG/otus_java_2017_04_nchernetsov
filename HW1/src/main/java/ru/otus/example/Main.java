@@ -1,27 +1,20 @@
 package ru.otus.example;
 
-import au.com.bytecode.opencsv.CSVReader;
+import ru.otus.util.CSVutil;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
 
         String pathToFile = "HW1/src/main/resources/example.csv";
-        char cvsSplitBy = ';';
+        char csvSplitBy = ';';
 
-        CSVReader reader = new CSVReader(new FileReader(pathToFile), cvsSplitBy);
+        List<String> strings = CSVutil.readFromCSV(pathToFile, csvSplitBy);
 
-        String[] strings;
-
-        while ((strings = reader.readNext()) != null) {
-            for (String s : strings) {
-                if (s.equals(""))  //пустые строки пропускаем
-                    continue;
-                System.out.println(s.trim());
-            }
+        for (String s : strings) {
+            System.out.println(s);
         }
-
     }
 }

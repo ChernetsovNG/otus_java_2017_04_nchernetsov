@@ -29,16 +29,6 @@
             <artifactId>opencsv</artifactId>
             <version>${net.sf.opencsv.version}</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.proguard</groupId>
-            <artifactId>proguard-base</artifactId>
-            <version>5.3.2</version>
-        </dependency>
     </dependencies>
 
     <build>

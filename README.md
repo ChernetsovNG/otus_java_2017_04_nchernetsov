@@ -7,3 +7,5 @@
 Имя - Чернецов Никита Геннадьевич
 
 Name - Chernetsov Nikita
+
+e-mail - n.chernetsov86@gmail.com

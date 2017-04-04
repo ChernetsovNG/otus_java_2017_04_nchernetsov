@@ -43,7 +43,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>assembly</goal>
                         </goals>
@@ -69,7 +69,7 @@
                 <version>2.0.14</version>
                 <executions>
                     <execution>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>proguard</goal>
                         </goals>

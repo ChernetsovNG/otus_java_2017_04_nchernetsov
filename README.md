@@ -1,11 +1,8 @@
-# otus_java_2017_04_nchernetsov
+# Примеры для курса "Разработчик Java" в Otus.ru
 
-Репозиторий с домашними заданиями по курсу "Разработчик Java" от www.otus.ru
+Группа 2017-04.1
 
-Мои данные:
+### Автор 
+Nikita Chernetsov (Никита Чернецов)
 
-Имя - Чернецов Никита Геннадьевич
-
-Name - Chernetsov Nikita
-
-e-mail - n.chernetsov86@gmail.com
+n.chernetsov86@gmail.com

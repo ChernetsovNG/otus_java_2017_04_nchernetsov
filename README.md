@@ -6,3 +6,5 @@
 Nikita Chernetsov (Никита Чернецов)
 
 n.chernetsov86@gmail.com
+
+####Комментарий по ДЗ HW2:

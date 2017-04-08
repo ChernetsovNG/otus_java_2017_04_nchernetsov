@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static ru.otus.measure.InstrumentationAgent.printSize;
+import static ru.otus.measure.InstrumentationAgent.printObjectSizeByte;
 
 class TestData {
     public TestData() {
@@ -30,24 +30,24 @@ class TestData {
         final BigDecimal bd = new BigDecimal("999999999999999999.99999999");
         final Calendar calendar = Calendar.getInstance();
 
-        printSize(sb);
-        printSize(falseBoolean);
-        printSize(zeroInt);
-        printSize(zeroDouble);
-        printSize(zeroLong);
-        printSize(zeroLongP);
-        printSize(maxLong);
-        printSize(maxLongP);
-        printSize(minLongP);
-        printSize(emptyString);
-        printSize(string);
-        printSize(strings);
-        printSize(moreStrings);
-        printSize(someStrings);
-        printSize(bd);
-        printSize(calendar);
+        printObjectSizeByte(sb);
+        printObjectSizeByte(falseBoolean);
+        printObjectSizeByte(zeroInt);
+        printObjectSizeByte(zeroDouble);
+        printObjectSizeByte(zeroLong);
+        printObjectSizeByte(zeroLongP);
+        printObjectSizeByte(maxLong);
+        printObjectSizeByte(maxLongP);
+        printObjectSizeByte(minLongP);
+        printObjectSizeByte(emptyString);
+        printObjectSizeByte(string);
+        printObjectSizeByte(strings);
+        printObjectSizeByte(moreStrings);
+        printObjectSizeByte(someStrings);
+        printObjectSizeByte(bd);
+        printObjectSizeByte(calendar);
 
-        printSize(this);
+        printObjectSizeByte(this);
     }
 
 }

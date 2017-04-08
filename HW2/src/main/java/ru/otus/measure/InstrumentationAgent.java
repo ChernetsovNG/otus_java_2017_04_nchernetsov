@@ -3,6 +3,9 @@ package ru.otus.measure;
 import java.lang.instrument.Instrumentation;
 
 public class InstrumentationAgent {
+    static int bitInByte = 8;
+    static int ByteInKb = 1024;
+    static int byteInMb = ByteInKb * 1024;
 
     private static volatile Instrumentation instrumentation;
 
@@ -14,9 +17,14 @@ public class InstrumentationAgent {
         instrumentation = inst;
     }
 
-    public static void printSize(final Object object) {
+    public static void printObjectSizeByte(final Object object) {
         System.out.println("Object: " + object + " of type: " + object.getClass() +
                 " has size of: " + getObjectSize(object) + " bytes\n");
+    }
+
+    public static void printObjectSizeMb(final Object object) {
+        System.out.println("Object: " + object + " of type: " + object.getClass() +
+                " has size of: " + ((double) getObjectSize(object))/byteInMb + " Mb\n");
     }
 
     public static long getObjectSize(final Object object) {

@@ -32,11 +32,9 @@
                     <archive>
                         <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
-                    <finalName>${project.build.finalName}</finalName>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 
 </project>

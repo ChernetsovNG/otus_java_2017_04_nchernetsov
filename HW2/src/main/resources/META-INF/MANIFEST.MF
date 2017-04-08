@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 Built-By: n_chernetsov
 Build-Jdk: 1.8.0_121
+Main-Class: ru.otus.main.Main
 Premain-Class: ru.otus.measure.InstrumentationAgent
 Agent-Class: ru.otus.measure.InstrumentationAgent

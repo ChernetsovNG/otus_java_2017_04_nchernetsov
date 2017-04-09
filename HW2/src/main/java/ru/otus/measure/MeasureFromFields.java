@@ -6,8 +6,9 @@ public class MeasureFromFields {
     static long sumPrimitiveBit = 0;  //сумма по всем примитывным типам данного объекта и по всем его ссылкам
     static long sumPrimitiveByte = 0;
 
-    public static long getObjectSize(Object object) throws IllegalAccessException {
-        Field[] fields = object.getClass().getDeclaredFields();
+    public static long getObjectSize(final Object object) throws IllegalAccessException {
+        Class clazz = object.getClass();
+        Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (field.getType().isPrimitive()) {
                 switch (field.getType().getName()) {
@@ -38,7 +39,8 @@ public class MeasureFromFields {
                 }
             }
             else {
-                System.out.println(field.getType().getCanonicalName());
+                field.setAccessible(true);
+                System.out.println(field.get(object));
             }
         }
         sumPrimitiveByte = sumPrimitiveBit / 8;

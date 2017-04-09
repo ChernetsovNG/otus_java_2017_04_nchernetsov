@@ -17,13 +17,17 @@ public class InstrumentationAgent {
         instrumentation = inst;
     }
 
+    public static String trimString(String str, int limit) {
+        return (str.length() > limit ? str.substring(0, limit)+"..." : str);
+    }
+
     public static void printObjectSizeByte(final Object object) {
-        System.out.println("Object: " + object + " of type: " + object.getClass() +
+        System.out.println("Object: " + trimString(object.toString(), 15) + " of type: " + object.getClass() +
                 " has size of: " + getObjectSize(object) + " bytes\n");
     }
 
     public static void printObjectSizeMb(final Object object) {
-        System.out.println("Object: " + object + " of type: " + object.getClass() +
+        System.out.println("Object: " + trimString(object.toString(), 15) + " of type: " + object.getClass() +
                 " has size of: " + ((double) getObjectSize(object))/byteInMb + " Mb\n");
     }
 

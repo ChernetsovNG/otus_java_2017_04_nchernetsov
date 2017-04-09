@@ -2,7 +2,11 @@ package ru.otus.main;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
+import static ru.otus.measure.InstrumentationAgent.printObjectSizeByte;
 import static ru.otus.measure.InstrumentationAgent.printObjectSizeMb;
 
 public class Main {
@@ -11,32 +15,37 @@ public class Main {
         Runtime runtime = Runtime.getRuntime();
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
 
-        System.out.println("Starting pid: " + ManagementFactory.getRuntimeMXBean().getName() + "/n");
+        System.out.println("Starting pid: " + ManagementFactory.getRuntimeMXBean().getName() + "\n");
 
+        //в тестовых данных рассмотрены разные типы
         //TestData testData = new TestData();
         //testData.printObjectsSize();
 
-        int size = 50 * 1024 * 1024;
-        Object[] array = new Object[size];
-        System.out.println("Array of size: " + array.length + " created");
-        printObjectSizeMb(array);
+        printObjectSizeByte(new Object());
+        printObjectSizeByte(new String(""));
+        printObjectSizeByte(new ArrayList<Integer>());
+        printObjectSizeByte(new Integer(1));
+        printObjectSizeByte(new HashMap<>());
 
-        Thread.sleep(1 * 1000);
+        Thread.sleep(3 * 1000);
 
-        int n = 0;
-        System.out.println("Starting the loop\n");
-        while (n < Integer.MAX_VALUE) {
-            int i = n % size;
-            array[i] = new String(""); //no String pool
-            n++;
-            /*if (n % 1024 == 0) {
-                Thread.sleep(1);
-            }*/
-            if (n % size == 0) {
-                System.out.println("Created " + n + " objects");
-                System.out.println("Creating new array");
-                array = new Object[size];
-                printObjectSizeMb(array);
+        System.out.println("Start growing up ArrayList...\n");
+
+        int size = 0;
+        List<Integer> grownUpList = new ArrayList<>();
+        long allocatedMemory;
+
+        while (size < Integer.MAX_VALUE) {
+            size++;
+            grownUpList.add(1);
+            Thread.sleep(1);
+            if (size % 1000 == 0) {
+                printObjectSizeByte(grownUpList);
+                System.out.println("size = " + size + "\n");
+                allocatedMemory = runtime.totalMemory() - runtime.freeMemory();
+                System.out.println("allocated memory = " + allocatedMemory + " bytes\n");
+                System.out.println("allocated memory (on 1 element) = " + allocatedMemory/size + " bytes\n");
+                System.out.println("----------------\n");
             }
         }
 

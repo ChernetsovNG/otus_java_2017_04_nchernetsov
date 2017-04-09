@@ -12,10 +12,6 @@
 hs_err_pid*
 
 /.idea/
-/HW1/.idea/
-/HW1/target/
-/HW1/*.iml
-
-/HW2/.idea/
-/HW2/target/
-/HW2/*.iml
+/*/.idea/
+/*/target/
+/*/*.iml

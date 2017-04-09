@@ -10,7 +10,7 @@ import static ru.otus.measure.InstrumentationAgent.*;
 
 public class Main {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IllegalAccessException, NoSuchFieldException {
         Runtime runtime = Runtime.getRuntime();
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
 
@@ -28,14 +28,18 @@ public class Main {
         String str = new String("");
         System.out.println(getSomeObjectsSize(str, str.toCharArray()) + " bytes\n");
 
-        Thread.sleep(3 * 1000);
+        Thread.sleep(1 * 1000);
 
         System.out.println("Start growing up ArrayList...\n");
 
         int size = 0;
         List<Integer> grownUpList = new ArrayList<>();
         long sumMemory = 0;
-        long allocatedMemory = 0;
+        long freeMemoryBefore = 0;
+        long freeMemoryAfter = 0;
+        long deltaMemory = 0;
+
+        freeMemoryBefore = runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory());
 
         while (size < Integer.MAX_VALUE) {
             size++;
@@ -43,8 +47,8 @@ public class Main {
             sumMemory += getObjectSize(addInt);
             grownUpList.add(addInt);
 
-            Thread.sleep(1);
-            if (size % 1000 == 0) {
+            if (size % 1_000_000 == 0) {
+                Thread.sleep(1000);
                 System.out.println("Self object 'grownUpList' size");
                 printObjectSizeByte(grownUpList);
                 System.out.println("Array from 'grownUpList' size");
@@ -52,11 +56,13 @@ public class Main {
                 System.out.println("Array from 'grownUpList' / n = " +
                         getObjectSize(grownUpList.toArray())/size + " bytes\n");
                 System.out.println("Count elements of 'grownUpList' = " + size + "\n");
-                allocatedMemory = runtime.totalMemory() - runtime.freeMemory();
-                System.out.println("allocated memory = " + allocatedMemory + " bytes\n");
-                System.out.println("allocated memory (on 1 element) = " + allocatedMemory/size + " bytes\n");
+                freeMemoryAfter = runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory());
+                deltaMemory = freeMemoryBefore - freeMemoryAfter;
+                System.out.println("delta memory = " + deltaMemory + " bytes\n");
+                System.out.println("delta memory (on 1 element) = " + deltaMemory/size + " bytes\n");
                 System.out.println("sum memory of Integer objects = " + sumMemory + " bytes\n");
                 System.out.println("----------------\n");
+                freeMemoryBefore = freeMemoryAfter;
             }
         }
 

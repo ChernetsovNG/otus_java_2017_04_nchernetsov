@@ -41,6 +41,7 @@ public class MeasureFromFields {
             else {
                 field.setAccessible(true);
                 System.out.println(field.get(object));
+                System.out.println(field.getType().isArray());
             }
         }
         sumPrimitiveByte = sumPrimitiveBit / 8;

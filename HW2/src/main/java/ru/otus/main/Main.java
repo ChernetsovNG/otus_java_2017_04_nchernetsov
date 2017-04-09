@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static ru.otus.measure.InstrumentationAgent.getObjectSize;
 import static ru.otus.measure.InstrumentationAgent.printObjectSizeByte;
 import static ru.otus.measure.InstrumentationAgent.printObjectSizeMb;
 
@@ -33,18 +34,22 @@ public class Main {
 
         int size = 0;
         List<Integer> grownUpList = new ArrayList<>();
-        long allocatedMemory;
+        long sumMemory = 0;
+        long allocatedMemory = 0;
 
         while (size < Integer.MAX_VALUE) {
             size++;
-            grownUpList.add(1);
+            Integer addInt = new Integer(size);
+            sumMemory += getObjectSize(addInt);
+            grownUpList.add(addInt);
             Thread.sleep(1);
             if (size % 1000 == 0) {
                 printObjectSizeByte(grownUpList);
-                System.out.println("size = " + size + "\n");
+                System.out.println("size of ArrayList = " + size + "\n");
                 allocatedMemory = runtime.totalMemory() - runtime.freeMemory();
                 System.out.println("allocated memory = " + allocatedMemory + " bytes\n");
                 System.out.println("allocated memory (on 1 element) = " + allocatedMemory/size + " bytes\n");
+                System.out.println("sum memory of Integer objects = " + sumMemory + " bytes\n");
                 System.out.println("----------------\n");
             }
         }

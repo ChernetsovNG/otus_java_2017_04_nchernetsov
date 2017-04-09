@@ -42,10 +42,16 @@ public class Main {
             Integer addInt = new Integer(size);
             sumMemory += getObjectSize(addInt);
             grownUpList.add(addInt);
+
             Thread.sleep(1);
             if (size % 1000 == 0) {
+                System.out.println("Self object 'grownUpList' size");
                 printObjectSizeByte(grownUpList);
-                System.out.println("size of ArrayList = " + size + "\n");
+                System.out.println("Array from 'grownUpList' size");
+                printObjectSizeByte(grownUpList.toArray());
+                System.out.println("Array from 'grownUpList' / n = " +
+                        getObjectSize(grownUpList.toArray())/size + " bytes\n");
+                System.out.println("Count elements of 'grownUpList' = " + size + "\n");
                 allocatedMemory = runtime.totalMemory() - runtime.freeMemory();
                 System.out.println("allocated memory = " + allocatedMemory + " bytes\n");
                 System.out.println("allocated memory (on 1 element) = " + allocatedMemory/size + " bytes\n");

@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static ru.otus.measure.InstrumentationAgent.getObjectSize;
-import static ru.otus.measure.InstrumentationAgent.printObjectSizeByte;
-import static ru.otus.measure.InstrumentationAgent.printObjectSizeMb;
+import static ru.otus.measure.InstrumentationAgent.*;
 
 public class Main {
 
@@ -27,6 +25,8 @@ public class Main {
         printObjectSizeByte(new ArrayList<Integer>());
         printObjectSizeByte(new Integer(1));
         printObjectSizeByte(new HashMap<>());
+        String str = new String("");
+        System.out.println(getSomeObjectsSize(str, str.toCharArray()) + " bytes\n");
 
         Thread.sleep(3 * 1000);
 

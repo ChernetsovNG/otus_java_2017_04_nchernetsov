@@ -31,6 +31,14 @@ public class InstrumentationAgent {
                 " has size of: " + ((double) getObjectSize(object))/byteInMb + " Mb\n");
     }
 
+    public static long getSomeObjectsSize(Object... objects) {
+        long sum = 0;
+        for (Object object : objects) {
+            sum += getObjectSize(object);
+        }
+        return sum;
+    }
+
     public static long getObjectSize(final Object object) {
         if (instrumentation == null) {
             throw new IllegalStateException("Agent not initialized.");

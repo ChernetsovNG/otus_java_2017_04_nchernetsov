@@ -43,7 +43,7 @@ public class InstrumentationAgent {
         complexSize = 0;
         visitedObjectsList.clear();
 
-        complexSize = getObjectSize(object);
+        complexSize += getObjectSize(object);
         visitedObjectsList.add(object);
 
         Field[] fields = object.getClass().getDeclaredFields();

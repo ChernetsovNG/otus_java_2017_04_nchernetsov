@@ -43,7 +43,6 @@ public class Main {
                 Thread.sleep(1000);
                 memory = getObjectComplexSize(grownUpList);
                 System.out.println("grownUpList memory size = " + memory + " bytes\n");
-                printObjectSizeByte(grownUpList);
                 System.out.println("Count elements of 'grownUpList' = " + size + "\n");
                 System.out.println("Memory on 1 element = " + memory/size + " bytes\n");
                 System.out.println("----------------\n");

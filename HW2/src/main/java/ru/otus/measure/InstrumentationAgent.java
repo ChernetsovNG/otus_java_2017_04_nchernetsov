@@ -11,6 +11,7 @@ public class InstrumentationAgent {
     static int bitInByte = 8;
     static int ByteInKb = 1024;
     static int byteInMb = ByteInKb * 1024;
+
     private static long complexSize = 0;  //размер объекта и всех его подъобъектов по ссылкам
     private static List<Object> visitedObjectsList = new ArrayList<>();
 
@@ -48,14 +49,14 @@ public class InstrumentationAgent {
 
         Field[] fields = object.getClass().getDeclaredFields();
         if (fields.length > 0) {
-            goForFielsd(object, fields);
+            goForFields(object, fields);
         }
 
         return complexSize;
     }
 
     //Обход полей объекта
-    private static void goForFielsd(Object object, Field[] fields) {
+    private static void goForFields(Object object, Field[] fields) {
         for (Field field : fields) {
             if (field.getType().isPrimitive()) {
                 //do nothing
@@ -86,7 +87,7 @@ public class InstrumentationAgent {
 
         Field[] fields = object.getClass().getDeclaredFields();
         if (fields.length > 0) {
-            goForFielsd(object, fields);
+            goForFields(object, fields);
         }
     }
 

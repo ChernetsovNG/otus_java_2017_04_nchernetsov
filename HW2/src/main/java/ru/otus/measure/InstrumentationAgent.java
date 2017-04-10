@@ -1,11 +1,15 @@
 package ru.otus.measure;
 
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Field;
+
+import static java.lang.reflect.Modifier.isStatic;
 
 public class InstrumentationAgent {
     static int bitInByte = 8;
     static int ByteInKb = 1024;
     static int byteInMb = ByteInKb * 1024;
+    private static long complexSize = 0;  //размер объекта и всех его подъобъектов по ссылкам
 
     private static volatile Instrumentation instrumentation;
 
@@ -31,18 +35,51 @@ public class InstrumentationAgent {
                 " has size of: " + ((double) getObjectSize(object))/byteInMb + " Mb\n");
     }
 
-    public static long getSomeObjectsSize(Object... objects) {
-        long sum = 0;
-        for (Object object : objects) {
-            sum += getObjectSize(object);
+    //Основной метод вычисления размера
+    public static long getObjectComplexSize(Object object) throws IllegalAccessException {
+        complexSize = 0;
+        complexSize = getObjectSize(object);
+
+        Field[] fields = object.getClass().getDeclaredFields();
+        if (fields.length > 0) {
+            goForFielsd(object, fields);
         }
-        return sum;
+
+        return complexSize;
     }
 
+    //Обход полей объекта
+    private static void goForFielsd(Object object, Field[] fields) throws IllegalAccessException {
+        for (Field field : fields) {
+            if (field.getType().isPrimitive()) {
+                //do nothing
+            }
+            else {
+                //рассматриваем не примитивы и не статические поля
+                if (!isStatic(field.getModifiers())) {
+                    field.setAccessible(true);
+                    Object linkObject = field.get(object);
+                    recursiveCalc(linkObject);
+                }
+            }
+        }
+    }
+
+    //рекурсивный вызов обхода полей ссылочного поля
+    public static void recursiveCalc(Object object) throws IllegalAccessException {
+        complexSize += getObjectSize(object);
+        Field[] fields = object.getClass().getDeclaredFields();
+        if (fields.length > 0) {
+            goForFielsd(object, fields);
+        }
+    }
+
+    //стандартный метод вычисления размера одиночного объекта
     public static long getObjectSize(final Object object) {
         if (instrumentation == null) {
             throw new IllegalStateException("Agent not initialized.");
         }
         return instrumentation.getObjectSize(object);
     }
+
 }

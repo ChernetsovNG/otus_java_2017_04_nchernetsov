@@ -1,7 +1,5 @@
 package ru.otus.main;
 
-import ru.otus.measure.MeasureFromFields;
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
@@ -28,7 +26,6 @@ public class Main {
         printObjectSizeByte(new Integer(1));
         printObjectSizeByte(new HashMap<>());
         String str = new String("");
-        System.out.println(getSomeObjectsSize(str, str.toCharArray()) + " bytes\n");
 
         Thread.sleep(1 * 1000);
 
@@ -41,7 +38,7 @@ public class Main {
         long freeMemoryAfter = 0;
         long deltaMemory = 0;
 
-        MeasureFromFields.getObjectSize(grownUpList);
+        System.out.println(getObjectComplexSize(new int[0]));
 
         freeMemoryBefore = runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory());
 

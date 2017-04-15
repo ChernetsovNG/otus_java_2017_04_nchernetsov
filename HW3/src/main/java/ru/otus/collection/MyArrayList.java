@@ -138,14 +138,15 @@ public class MyArrayList<T> implements List<T> {
         return true;
     }
 
+    //Добавить все элементы в конец массива
     public boolean addAll(Collection<? extends T> c) {
-        Iterator<? extends T> iterator = c.iterator();
-        while (iterator.hasNext()) {
-            this.add(iterator.next());
+        for (T t : c) {
+            this.add(t);
         }
         return true;
     }
 
+    //Добавить все элементы в массив, начиная с заданной позиции (остальные сдвинуть вправо)
     public boolean addAll(int index, Collection<? extends T> c) {
         return false;
     }

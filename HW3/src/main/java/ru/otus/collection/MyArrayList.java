@@ -91,7 +91,40 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public boolean remove(Object o) {
+        if (o == null) {
+            for (int i = 0; i < busySize; i++) {
+                if (array[i] == null) {
+                    remove_i(i);
+                    return true;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < busySize; i++) {
+                if (array[i].equals(o)) {
+                    remove_i(i);
+                    return true;
+                }
+            }
+        }
         return false;
+    }
+
+    //удалить i-й элемент, сдвинуть элементы чтобы не было "пустых" мест
+    private void remove_i(int i) {
+        if (i == (busySize-1)) {  //последний элемент
+            //do nothing
+        }
+        else {  //не последний элемент
+            for (int j = i; j < (busySize-1); j++) {
+                array[j] = array[j+1];
+            }
+        }
+        array[--busySize] = null;
+        if (busySize < size/2) {
+            size = size / 2;
+            array = Arrays.copyOf(array, size);
+        }
     }
 
     public boolean containsAll(Collection<?> c) {

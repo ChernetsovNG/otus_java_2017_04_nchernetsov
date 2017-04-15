@@ -12,5 +12,6 @@ public class Main {
 
         MyArrayList<Number> myList = new MyArrayList<>(listFloat);
         myList.add(3.3f);
+        myList.remove(5.5f);
     }
 }

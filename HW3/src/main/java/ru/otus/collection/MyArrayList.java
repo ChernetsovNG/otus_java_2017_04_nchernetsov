@@ -6,6 +6,8 @@ public class MyArrayList<T> implements List<T> {
     private T[] array;     //массив элементов
     private int size;      //под сколько элементов выделена память
     private int busySize;  //сколько элементов занято
+    private float sizeFactor = 2.0f;  //во сколько раз увеличивается размер массива при расширении
+                                      //(и уменьшается при сужении)
 
     //Constructors
 
@@ -83,7 +85,7 @@ public class MyArrayList<T> implements List<T> {
             array[busySize++] = t;
         }
         else {  //иначе расширяем массив в 2 раза
-            size = size*2;
+            size = (int) (size * sizeFactor);
             array = Arrays.copyOf(array, size);
             array[busySize++] = t;
         }
@@ -121,8 +123,9 @@ public class MyArrayList<T> implements List<T> {
             }
         }
         array[--busySize] = null;
-        if (busySize < size/2) {
-            size = size / 2;
+        int sizeDivFactor = (int) (size / sizeFactor);
+        if (busySize < sizeDivFactor) {  //уменьшаем выделенный под массив размер
+            size = sizeDivFactor;
             array = Arrays.copyOf(array, size);
         }
     }

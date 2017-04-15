@@ -3,8 +3,8 @@ package ru.otus.collection;
 import java.util.*;
 
 public class MyArrayList<T> implements List<T> {
-    private T[] array;
-    private int size;  //под сколько элементов выделена память
+    private T[] array;     //массив элементов
+    private int size;      //под сколько элементов выделена память
     private int busySize;  //сколько элементов занято
 
     //Constructors
@@ -110,7 +110,7 @@ public class MyArrayList<T> implements List<T> {
         return false;
     }
 
-    //удалить i-й элемент, сдвинуть элементы чтобы не было "пустых" мест
+    //удалить i-й элемент, сдвинуть элементы, чтобы не было "пустых" мест
     private void remove_i(int i) {
         if (i == (busySize-1)) {  //последний элемент
             //do nothing
@@ -128,7 +128,11 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public boolean containsAll(Collection<?> c) {
-        return false;
+        for (Object object : c) {
+            if (!this.contains(object))
+                return false;
+        }
+        return true;
     }
 
     public boolean addAll(Collection<? extends T> c) {

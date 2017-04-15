@@ -10,8 +10,8 @@ public class MyArrayList<T> implements List<T> {
     //Constructors
 
     public MyArrayList() {
-        this.array = (T[]) new Object[]{};
-        this.size = 0;
+        this.array = (T[]) new Object[1];  //минимально - один элемент
+        this.size = 1;
         this.busySize = 0;
     }
 
@@ -22,7 +22,7 @@ public class MyArrayList<T> implements List<T> {
             this.busySize = 0;
         }
         else if (initialCapacity == 0) {
-            this.array = (T[]) new Object[]{};
+            this.array = (T[]) new Object[1];
             this.size = initialCapacity;
             this.busySize = 0;
         }
@@ -79,7 +79,7 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public boolean add(T t) {
-        if (busySize + 1 < size) {  //можно заполнить массив без расширения
+        if (busySize + 1 <= size) {  //можно заполнить массив без расширения
             array[busySize++] = t;
         }
         else {  //иначе расширяем массив в 2 раза
@@ -136,7 +136,11 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public boolean addAll(Collection<? extends T> c) {
-        return false;
+        Iterator<? extends T> iterator = c.iterator();
+        while (iterator.hasNext()) {
+            this.add(iterator.next());
+        }
+        return true;
     }
 
     public boolean addAll(int index, Collection<? extends T> c) {

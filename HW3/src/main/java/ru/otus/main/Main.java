@@ -9,9 +9,9 @@ public class Main {
         ArrayList<Float> listFloat = new ArrayList<>(2);
         listFloat.add(3.2f);
         listFloat.add(5.5f);
-        listFloat.containsAll(null);
 
-        MyArrayList<Number> myList = new MyArrayList<>(listFloat);
+        MyArrayList<Number> myList = new MyArrayList<>();
+        myList.addAll(listFloat);
         myList.add(3.3f);
         myList.remove(5.5f);
     }

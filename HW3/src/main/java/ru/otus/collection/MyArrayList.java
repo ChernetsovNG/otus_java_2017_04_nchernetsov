@@ -309,7 +309,36 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new MyIterator();;
+        return new MyIterator();
+    }
+
+    private class MyIterator implements Iterator<T> {
+        int cursor;
+        int lastRet = -1;
+
+        @Override
+        public boolean hasNext() {
+            return (cursor != busySize);
+        }
+
+        @Override
+        public T next() {
+            int i = cursor;
+            if (i >= busySize)
+                throw new NoSuchElementException();
+            T[] itArray = MyArrayList.this.array;
+            cursor = i + 1;
+            return itArray[lastRet = i];
+        }
+
+        @Override
+        public void remove() {
+            if (lastRet < 0)
+                throw new IllegalStateException();
+            MyArrayList.this.remove(lastRet);
+            cursor = lastRet;
+            lastRet = -1;
+        }
     }
 
     public ListIterator<T> listIterator() {

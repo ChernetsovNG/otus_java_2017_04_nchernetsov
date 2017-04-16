@@ -62,6 +62,21 @@ public class MyArrayList<T> implements List<T> {
         return false;
     }
 
+    private int containsWithIndex(Object o) {
+        if (o == null) {
+            for (int i = 0; i < busySize; i++) {
+                if (array[i] == null)
+                    return i;
+            }
+        } else {
+            for (int i = 0; i < busySize; i++) {
+                if (array[i].equals(o))
+                    return i;
+            }
+        }
+        return -1;
+    }
+
     @Override
     public Iterator<T> iterator() {
         return null;
@@ -148,15 +163,55 @@ public class MyArrayList<T> implements List<T> {
 
     //Добавить все элементы в массив, начиная с заданной позиции (остальные сдвинуть вправо)
     public boolean addAll(int index, Collection<? extends T> c) {
-        return false;
+        if ((index < 0) || (index >= busySize)) {
+            throw new IndexOutOfBoundsException("index: " + index + " not correct");
+        }
+        int N_in = c.size();
+        T[] array_in = (T[]) c.toArray();
+        int newBusySize = busySize + N_in;
+        while (size < newBusySize) {  //если элементов в массиве недостаточно для размещения новой коллекции
+                                      //то увеличиваем массив
+            size = (int) (size * sizeFactor);
+        }
+
+        array = Arrays.copyOf(array, size);
+
+        for (int i = index; i < busySize; i++) {  //сдвигаем элементы вправо
+            array[i + N_in] = array[i];
+        }
+        for (int i = index; i < (index + N_in); i++) {
+            array[i] = array_in[i - index];
+        }
+
+        busySize = newBusySize;
+        return true;
     }
 
     public boolean removeAll(Collection<?> c) {
-        return false;
+        int index = -1;
+        boolean isThisModify = false;
+        for (Object t : c) {
+            if (this.contains(t)) {
+                index = this.containsWithIndex(t);
+                this.remove_i(index);
+                isThisModify = true;
+            }
+        }
+        return isThisModify;
     }
 
     public boolean retainAll(Collection<?> c) {
-        return false;
+        int index = 0;
+        boolean isThisModify = false;
+        while (index < busySize) {
+            if (!c.contains(array[index])) {
+                this.remove_i(index);
+                isThisModify = true;
+            } else {
+                index++;
+            }
+        }
+        return isThisModify;
     }
 
     public void sort(Comparator<? super T> c) {
@@ -168,7 +223,10 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public T get(int index) {
-        return null;
+        if ((index < 0) || (index >= busySize)) {
+            throw new IndexOutOfBoundsException("index: " + index + " not correct");
+        }
+        return array[index];
     }
 
     public T set(int index, T element) {
@@ -180,7 +238,12 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public T remove(int index) {
-        return null;
+        if ((index < 0) || (index >= busySize)) {
+            throw new IndexOutOfBoundsException("index: " + index + " not correct");
+        }
+        T removedElement = array[index];
+        remove_i(index);
+        return removedElement;
     }
 
     public int indexOf(Object o) {

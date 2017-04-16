@@ -2,7 +2,7 @@ package ru.otus.collection;
 
 import java.util.*;
 
-public class MyArrayList<T> implements List<T> {
+public class MyArrayList<T> extends AbstractList<T> implements List<T> {
     private T[] array;     //массив элементов
     private int size;      //под сколько элементов выделена память
     private int busySize;  //сколько элементов занято
@@ -62,6 +62,7 @@ public class MyArrayList<T> implements List<T> {
         return false;
     }
 
+    //поиск индекса элемента (с начала массива)
     private int containsWithIndex(Object o) {
         if (o == null) {
             for (int i = 0; i < busySize; i++) {
@@ -77,9 +78,20 @@ public class MyArrayList<T> implements List<T> {
         return -1;
     }
 
-    @Override
-    public Iterator<T> iterator() {
-        return null;
+    //поиск индекса элемента (с конца массива)
+    private int containsLastIndex(Object o) {
+        if (o == null) {
+            for (int i = busySize-1; i >= 0; i--) {
+                if (array[i] == null)
+                    return i;
+            }
+        } else {
+            for (int i = busySize-1; i >= 0; i--) {
+                if (array[i].equals(o))
+                    return i;
+            }
+        }
+        return -1;
     }
 
     public Object[] toArray() {
@@ -101,6 +113,8 @@ public class MyArrayList<T> implements List<T> {
         }
         else {  //иначе расширяем массив в 2 раза
             size = (int) (size * sizeFactor);
+            if (size == 1)
+                size = 2;  //на всякий случачй, т.к. если size = 1 и sizeFactor = 1.4, то массив бы не увеличился
             array = Arrays.copyOf(array, size);
             array[busySize++] = t;
         }
@@ -167,6 +181,9 @@ public class MyArrayList<T> implements List<T> {
             throw new IndexOutOfBoundsException("index: " + index + " not correct");
         }
         int N_in = c.size();
+        if (N_in == 0) {
+            return false;
+        }
         T[] array_in = (T[]) c.toArray();
         int newBusySize = busySize + N_in;
         while (size < newBusySize) {  //если элементов в массиве недостаточно для размещения новой коллекции
@@ -176,8 +193,8 @@ public class MyArrayList<T> implements List<T> {
 
         array = Arrays.copyOf(array, size);
 
-        for (int i = index; i < busySize; i++) {  //сдвигаем элементы вправо
-            array[i + N_in] = array[i];
+        for (int i = newBusySize-1; i >= index+N_in; i--) {  //сдвигаем элементы вправо
+            array[i] = array[i-N_in];
         }
         for (int i = index; i < (index + N_in); i++) {
             array[i] = array_in[i - index];
@@ -215,11 +232,16 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public void sort(Comparator<? super T> c) {
-
+        Arrays.sort(array, 0, busySize, c);
     }
 
     public void clear() {
-
+        for (int i = 0; i < size; i++) {
+            array[i] = null;
+        }
+        this.array = (T[]) new Object[1];
+        this.size = 1;
+        this.busySize = 0;
     }
 
     public T get(int index) {
@@ -230,11 +252,34 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public T set(int index, T element) {
-        return null;
+        if ((index < 0) || (index >= busySize)) {
+            throw new IndexOutOfBoundsException("index: " + index + " not correct");
+        }
+        T previousElement = array[index];
+        array[index] = element;
+
+        return previousElement;
     }
 
     public void add(int index, T element) {
+        if ((index < 0) || (index >= busySize)) {
+            throw new IndexOutOfBoundsException("index: " + index + " not correct");
+        }
 
+        int newBusySize = busySize + 1;
+        while (size < newBusySize) {  //если элементов в массиве недостаточно для размещения новой коллекции
+            //то увеличиваем массив
+            size = (int) (size * sizeFactor);
+        }
+
+        array = Arrays.copyOf(array, size);
+
+        for (int i = busySize; i > index ; i--) {  //сдвигаем элементы вправо
+            array[i] = array[i-1];
+        }
+        array[index] = element;
+
+        busySize = newBusySize;
     }
 
     public T remove(int index) {
@@ -247,11 +292,24 @@ public class MyArrayList<T> implements List<T> {
     }
 
     public int indexOf(Object o) {
-        return 0;
+        int index = -1;
+        if (this.contains(o)) {
+            index = this.containsWithIndex(o);
+        }
+        return index;
     }
 
     public int lastIndexOf(Object o) {
-        return 0;
+        int index = -1;
+        if (this.contains(o)) {
+            index = this.containsLastIndex(o);
+        }
+        return index;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new MyIterator();;
     }
 
     public ListIterator<T> listIterator() {

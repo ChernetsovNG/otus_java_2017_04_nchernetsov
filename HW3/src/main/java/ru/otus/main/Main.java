@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         //Тестируем созданный класс
         //1. Конструкторы
-        System.out.println("Конструкторы");
+        System.out.println("1. Конструкторы");
 
         List<Integer> myList1 = new MyArrayList<>();
         printList(myList1);
@@ -26,27 +26,102 @@ public class Main {
         System.out.println("");
 
         //2. Метод size()
-        System.out.println("Метод size()");
+        System.out.println("2. Метод size()");
         System.out.println(myList1.size());
         System.out.println(myList3.size());
         System.out.println("");
 
         //3. Метод isEmpty()
-        System.out.println("Метод isEmpty()");
+        System.out.println("3. Метод isEmpty()");
         System.out.println(myList1.isEmpty());
         System.out.println(myList3.isEmpty());
         System.out.println("");
 
         //4. Метод contains()
-        System.out.println("Метод contains");
+        System.out.println("4. Метод contains");
         System.out.println(myList1.contains(3));
         System.out.println(myList3.contains(3));
         System.out.println("");
 
         //5. Метод toArray()
-        System.out.println("Метод toArray");
+        System.out.println("5. Метод toArray");
         System.out.println(myList1.toArray());
         System.out.println(myList3.toArray());
+        System.out.println("");
+
+        //6. Метод add()
+        System.out.println("6. Метод add");
+        myList1.add(10);
+        myList1.add(15);
+        myList1.add(20);
+        printList(myList1);
+        System.out.println("");
+
+        //7. Метод remove(Object o)
+        System.out.println("7. Метод remove(Object o)");
+        myList1.remove(new Integer(12));
+        myList1.remove(new Integer(15));
+        printList(myList1);
+        System.out.println("");
+
+        //8. Метод containsAll()
+        System.out.println("8. Метод containsAll");
+        System.out.println(myList1.containsAll(Arrays.asList(10, 20, 30)));
+        System.out.println(myList1.containsAll(Arrays.asList(10, 20)));
+        System.out.println("");
+
+        //9. Метод addAll()
+        System.out.println("9. Метод addAll");
+        myList1.addAll(Arrays.asList(20, 30, 40, 50));
+        printList(myList1);
+        System.out.println("");
+
+        //10. Метод addAll(index, collection)
+        System.out.println("10. Метод addAll(index, collection)");
+        myList3.addAll(2, Arrays.asList(10, 11, 12));
+        printList(myList3);
+        System.out.println("");
+
+        //11. Метод removeAll
+        System.out.println("11. Метод removeAll");
+        myList1.removeAll(Arrays.asList(20, 50));
+        printList(myList1);
+        System.out.println("");
+
+        //12. Метод retainAll
+        System.out.println("12. Метод retainAll");
+        myList1.retainAll(Arrays.asList(10, 20));
+        printList(myList1);
+        System.out.println("");
+
+        //13. Метод sort
+        System.out.println("13. Метод sort");
+        myList3.sort(Integer::compareTo);
+        printList(myList3);
+        System.out.println("");
+
+        //14. Метод clear
+        System.out.println("14. Метод clear");
+        myList1.clear();
+        myList2.clear();
+        myList3.clear();
+        printList(myList1);
+        printList(myList2);
+        printList(myList3);
+        System.out.println("");
+
+        //15. Метод get
+        List<Integer> myList4 = new MyArrayList<>();
+
+        System.out.println("15. Метод get");
+        myList4.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        System.out.println(myList4.get(3));
+        System.out.println("");
+
+        //16. Метод set
+        System.out.println("16. Метод set");
+        myList4.set(2, new Integer(7));
+        printList(myList4);
         System.out.println("");
     }
 

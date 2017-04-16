@@ -161,6 +161,18 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
         }
     }
 
+    //Удалить из списка все вхождения заданного объекта
+    private boolean removeAllInclusion(Object o) {
+        int index = -1;
+        boolean isListModify = false;
+        while (this.contains(o)) {
+            index = containsWithIndex(o);
+            this.remove_i(index);
+            isListModify = true;
+        }
+        return isListModify;
+    }
+
     public boolean containsAll(Collection<?> c) {
         for (Object object : c) {
             if (!this.contains(object))
@@ -207,14 +219,9 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
     }
 
     public boolean removeAll(Collection<?> c) {
-        int index = -1;
         boolean isThisModify = false;
         for (Object t : c) {
-            if (this.contains(t)) {
-                index = this.containsWithIndex(t);
-                this.remove_i(index);
-                isThisModify = true;
-            }
+            isThisModify = this.removeAllInclusion(t);
         }
         return isThisModify;
     }

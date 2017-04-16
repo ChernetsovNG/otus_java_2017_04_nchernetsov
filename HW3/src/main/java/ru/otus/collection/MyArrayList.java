@@ -153,6 +153,8 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
         }
         array[--busySize] = null;
         int sizeDivFactor = (int) (size / sizeFactor);
+        if (sizeDivFactor == 0)
+            sizeDivFactor = 1;  //на всякий случай, чтобы размер массива не уменьшился до нуля
         if (busySize < sizeDivFactor) {  //уменьшаем выделенный под массив размер
             size = sizeDivFactor;
             array = Arrays.copyOf(array, size);

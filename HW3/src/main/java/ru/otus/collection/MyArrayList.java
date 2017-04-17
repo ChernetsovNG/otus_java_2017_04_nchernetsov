@@ -2,15 +2,17 @@ package ru.otus.collection;
 
 import java.util.*;
 
+import static java.lang.Math.sqrt;
+
 public class MyArrayList<T> extends AbstractList<T> implements List<T> {
     private T[] array;     //массив элементов
     private int size;      //под сколько элементов выделена память
     private int busySize;  //сколько элементов занято
-    private float sizeFactor = 2.0f;  //во сколько раз увеличивается размер массива при расширении
-                                      //(и уменьшается при сужении)
+    private float sizeFactor = (float) ((1+sqrt(5))/2.0f);
+    //во сколько раз увеличивается размер массива при расширении
+    //(и уменьшается при сужении). Берём в качестве множителя золотое сечение
 
     //Constructors
-
     public MyArrayList() {
         this.array = (T[]) new Object[1];  //минимально - один элемент
         this.size = 1;
@@ -112,7 +114,8 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
             array[busySize++] = t;
         }
         else {  //иначе расширяем массив в 2 раза
-            size = (int) (size * sizeFactor);
+            size = (int) (size * sizeFactor);  // используем мультипликативную схему перевыделения
+                                               // (реаллокации) памяти
             if (size == 1)
                 size = 2;  //на всякий случачй, т.к. если size = 1 и sizeFactor = 1.4, то массив бы не увеличился
             array = Arrays.copyOf(array, size);

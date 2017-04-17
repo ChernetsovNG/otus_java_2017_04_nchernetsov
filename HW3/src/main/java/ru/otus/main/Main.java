@@ -123,6 +123,57 @@ public class Main {
         myList4.set(2, new Integer(7));
         printList(myList4);
         System.out.println("");
+
+        //17. Метод add(index)
+        System.out.println("17. Метод add(index)");
+        myList4.add(4, new Integer(8));
+        printList(myList4);
+        System.out.println("");
+
+        //18. Метод remove(index)
+        System.out.println("18. Метод remove(index)");
+        myList4.remove(3);
+        printList(myList4);
+        System.out.println("");
+
+        //19. Метод indexOf
+        System.out.println("19. Метод indexOf");
+        System.out.println(myList4.indexOf(7));
+        System.out.println("");
+
+        //20. Метод lastIndexOf
+        System.out.println("20. Метод lastIndexOf");
+        myList4.add(7);
+        System.out.println(myList4.lastIndexOf(7));
+        System.out.println("");
+
+        //21. Метод iterator()
+        System.out.println("21. Метод iterator()");
+        for (Integer integer : myList4) {
+            System.out.println(integer);
+        }
+        System.out.println("");
+
+        //22. Метод Collections.addAll
+        System.out.println("22. Метод Collections.addAll");
+        Collections.addAll(myList4, 10,11,12);
+        printList(myList4);
+        System.out.println("");
+
+        //23. Метод Collections.copy
+        System.out.println("23. Метод Collections.copy");
+        List<Integer> src = new ArrayList<>();
+        src.add(20);
+        src.add(30);
+        Collections.copy(myList4, src);
+        printList(myList4);
+        System.out.println("");
+
+        //24. Метод Collections.sort
+        System.out.println("24. Метод Collections.sort");
+        Collections.sort(myList4, Integer::compareTo);
+        printList(myList4);
+        System.out.println("");
     }
 
 }

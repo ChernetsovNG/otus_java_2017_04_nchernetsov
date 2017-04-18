@@ -5,6 +5,8 @@ import java.util.*;
 import static java.lang.Math.sqrt;
 
 public class MyArrayList<T> extends AbstractList<T> implements List<T> {
+    private static final Object[] EMPTY_ARRAY = {};
+
     private T[] array;     //массив элементов
     private int size;      //под сколько элементов выделена память
     private int busySize;  //сколько элементов занято
@@ -14,8 +16,8 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
 
     //Constructors
     public MyArrayList() {
-        this.array = (T[]) new Object[1];  //минимально - один элемент
-        this.size = 1;
+        this.array = (T[]) EMPTY_ARRAY;
+        this.size = 0;
         this.busySize = 0;
     }
 
@@ -26,8 +28,8 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
             this.busySize = 0;
         }
         else if (initialCapacity == 0) {
-            this.array = (T[]) new Object[1];
-            this.size = initialCapacity;
+            this.array = (T[]) EMPTY_ARRAY;
+            this.size = 0;
             this.busySize = 0;
         }
         else
@@ -50,31 +52,18 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
     }
 
     public boolean contains(Object o) {
-        if (o == null) {
-           for (int i = 0; i < busySize; i++) {
-               if (array[i] == null)
-                   return true;
-           }
-        } else {
-            for (int i = 0; i < busySize; i++) {
-                if (array[i].equals(o))
-                    return true;
-            }
+        for (int i = 0; i < busySize; i++) {
+            if (Objects.equals(array[i], o))
+                return true;
         }
         return false;
     }
 
     //поиск индекса элемента (с начала массива)
     private int containsWithIndex(Object o) {
-        if (o == null) {
-            for (int i = 0; i < busySize; i++) {
-                if (array[i] == null)
-                    return i;
-            }
-        } else {
-            for (int i = 0; i < busySize; i++) {
-                if (array[i].equals(o))
-                    return i;
+        for (int i = 0; i < busySize; i++) {
+            if (Objects.equals(array[i], o)) {
+                return i;
             }
         }
         return -1;
@@ -82,16 +71,9 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
 
     //поиск индекса элемента (с конца массива)
     private int containsLastIndex(Object o) {
-        if (o == null) {
-            for (int i = busySize-1; i >= 0; i--) {
-                if (array[i] == null)
-                    return i;
-            }
-        } else {
-            for (int i = busySize-1; i >= 0; i--) {
-                if (array[i].equals(o))
-                    return i;
-            }
+        for (int i = busySize-1; i >= 0; i--) {
+            if (Objects.equals(array[i], o))
+                return i;
         }
         return -1;
     }
@@ -111,16 +93,24 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
 
     public boolean add(T t) {
         if (busySize + 1 <= size) {  //можно заполнить массив без расширения
-            array[busySize++] = t;
+            //do nothing
         }
-        else {  //иначе расширяем массив в 2 раза
-            size = (int) (size * sizeFactor);  // используем мультипликативную схему перевыделения
-                                               // (реаллокации) памяти
-            if (size == 1)
-                size = 2;  //на всякий случачй, т.к. если size = 1 и sizeFactor = 1.4, то массив бы не увеличился
+        else {  // используем мультипликативную схему перевыделения (реаллокации) памяти
+            if (size > Integer.MAX_VALUE/sizeFactor)
+                size = Integer.MAX_VALUE;
+            else {
+                if (size == 0) size = 1;
+                else {
+                    int newSize = (int) (size * sizeFactor);
+                    if (newSize == size)  //т.е. sizeFactor задан такой, что size не увеличивается
+                        size += 1;        //(например size = 2 и sizeFactor = 1.2)
+                    else
+                        size = newSize;
+                }
+            }
             array = Arrays.copyOf(array, size);
-            array[busySize++] = t;
         }
+        array[busySize++] = t;
         return true;
     }
 
@@ -128,7 +118,7 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
         if (o == null) {
             for (int i = 0; i < busySize; i++) {
                 if (array[i] == null) {
-                    remove_i(i);
+                    removeAtIndex(i);
                     return true;
                 }
             }
@@ -136,7 +126,7 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
         else {
             for (int i = 0; i < busySize; i++) {
                 if (array[i].equals(o)) {
-                    remove_i(i);
+                    removeAtIndex(i);
                     return true;
                 }
             }
@@ -145,7 +135,7 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
     }
 
     //удалить i-й элемент, сдвинуть элементы, чтобы не было "пустых" мест
-    private void remove_i(int i) {
+    private void removeAtIndex(int i) {
         if (i == (busySize-1)) {  //последний элемент
             //do nothing
         }
@@ -155,13 +145,6 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
             }
         }
         array[--busySize] = null;
-        int sizeDivFactor = (int) (size / sizeFactor);
-        if (sizeDivFactor == 0)
-            sizeDivFactor = 1;  //на всякий случай, чтобы размер массива не уменьшился до нуля
-        if (busySize < sizeDivFactor) {  //уменьшаем выделенный под массив размер
-            size = sizeDivFactor;
-            array = Arrays.copyOf(array, size);
-        }
     }
 
     //Удалить из списка все вхождения заданного объекта
@@ -170,7 +153,7 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
         boolean isListModify = false;
         while (this.contains(o)) {
             index = containsWithIndex(o);
-            this.remove_i(index);
+            this.removeAtIndex(index);
             isListModify = true;
         }
         return isListModify;
@@ -234,7 +217,7 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
         boolean isThisModify = false;
         while (index < busySize) {
             if (!c.contains(array[index])) {
-                this.remove_i(index);
+                this.removeAtIndex(index);
                 isThisModify = true;
             } else {
                 index++;
@@ -251,8 +234,8 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
         for (int i = 0; i < size; i++) {
             array[i] = null;
         }
-        this.array = (T[]) new Object[1];
-        this.size = 1;
+        this.array = (T[]) EMPTY_ARRAY;
+        this.size = 0;
         this.busySize = 0;
     }
 
@@ -299,7 +282,7 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
             throw new IndexOutOfBoundsException("index: " + index + " not correct");
         }
         T removedElement = array[index];
-        remove_i(index);
+        removeAtIndex(index);
         return removedElement;
     }
 

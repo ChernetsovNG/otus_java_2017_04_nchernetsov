@@ -6,6 +6,7 @@ import static java.lang.Math.sqrt;
 
 public class MyArrayList<T> extends AbstractList<T> implements List<T> {
     private static final Object[] EMPTY_ARRAY = {};
+    private static final int MAX_SIZE = Integer.MAX_VALUE;
 
     private T[] array;     //массив элементов
     private int size;      //под сколько элементов выделена память
@@ -96,8 +97,8 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
             //do nothing
         }
         else {  // используем мультипликативную схему перевыделения (реаллокации) памяти
-            if (size > Integer.MAX_VALUE/sizeFactor)
-                size = Integer.MAX_VALUE;
+            if (size > MAX_SIZE/sizeFactor)
+                size = MAX_SIZE;
             else {
                 if (size == 0) size = 1;
                 else {
@@ -123,20 +124,10 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
     }
 
     public boolean remove(Object o) {
-        if (o == null) {
-            for (int i = 0; i < busySize; i++) {
-                if (array[i] == null) {
-                    removeAtIndex(i);
-                    return true;
-                }
-            }
-        }
-        else {
-            for (int i = 0; i < busySize; i++) {
-                if (array[i].equals(o)) {
-                    removeAtIndex(i);
-                    return true;
-                }
+        for (int i = 0; i < busySize; i++) {
+            if (Objects.equals(array[i], o)) {
+                removeAtIndex(i);
+                return true;
             }
         }
         return false;
@@ -193,23 +184,38 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
             return false;
         }
         T[] array_in = (T[]) c.toArray();
-        int newBusySize = busySize + N_in;
-        while (size < newBusySize) {  //если элементов в массиве недостаточно для размещения новой коллекции
-                                      //то увеличиваем массив
-            size = (int) (size * sizeFactor);
-        }
 
-        array = Arrays.copyOf(array, size);
+        try {
+            if (busySize > MAX_SIZE - N_in) {
+                throw new IllegalStateException("Array cannot hold this collection (due to size restriction)");
+            }
+            else {
+                int newBusySize = busySize + N_in;
+                while (size < newBusySize) {  //если элементов в массиве недостаточно для размещения новой коллекции
+                                              // то увеличиваем массив
+                    int newSize = (int) (size * sizeFactor);
+                    if (newSize == size)
+                        size += 1;
+                    else
+                        size = newSize;
+                }
+                array = Arrays.copyOf(array, size);
 
-        for (int i = newBusySize-1; i >= index+N_in; i--) {  //сдвигаем элементы вправо
-            array[i] = array[i-N_in];
-        }
-        for (int i = index; i < (index + N_in); i++) {
-            array[i] = array_in[i - index];
-        }
+                for (int i = newBusySize-1; i >= index+N_in; i--) {  //сдвигаем элементы вправо
+                    array[i] = array[i-N_in];
+                }
+                for (int i = index; i < (index + N_in); i++) {
+                    array[i] = array_in[i-index];
+                }
 
-        busySize = newBusySize;
-        return true;
+                busySize = newBusySize;
+                return true;
+            }
+        }
+        catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     public boolean removeAll(Collection<?> c) {

@@ -110,8 +110,16 @@ public class MyArrayList<T> extends AbstractList<T> implements List<T> {
             }
             array = Arrays.copyOf(array, size);
         }
-        array[busySize++] = t;
-        return true;
+        try {
+            if (busySize + 1 > size) {
+                throw new IllegalStateException("Array is full and cannot be extended more");
+            }
+            array[busySize++] = t;
+            return true;
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     public boolean remove(Object o) {

@@ -9,7 +9,7 @@ import java.util.List;
 
 import static ru.otus.util.Utils.printList;
 
-public class Main {
+public class Main3 {
     public static void main(String[] args) {
         //Тестируем созданный класс
         //1. Конструкторы

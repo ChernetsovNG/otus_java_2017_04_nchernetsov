@@ -3,13 +3,12 @@ package ru.otus.main;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
-import static ru.otus.measure.InstrumentationAgent.*;
+import static ru.otus.measure.InstrumentationAgent.getObjectComplexSize;
+import static ru.otus.measure.InstrumentationAgent.printObjectSizeByte;
 
-public class Main {
+public class Main2 {
 
     public static void main(String[] args) throws InterruptedException, IllegalAccessException {
         Runtime runtime = Runtime.getRuntime();

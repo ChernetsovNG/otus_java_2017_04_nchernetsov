@@ -12,14 +12,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//Взято из: https://habrahabr.ru/post/269621/
+//https://habrahabr.ru/post/269621/
 public class MemoryUtil {
     private static final int NORM_NAME_LENGTH = 25;
     private static final long SIZE_KB = 1024;
     private static final long SIZE_MB = SIZE_KB * 1024;
     private static final long SIZE_GB = SIZE_MB * 1024;
-    private static final String SPACES = "                    ";
+    private static final String SPACES = "                     ";
     private static Map<String, MemRegion> memRegions;
+
+    private static int nYoungGarbageCollections = 0;
+    private static int nOldGarbageCollections = 0;
+    private static long timeToYoungGarbageCollections = 0;
+    private static long timeToOldGarbageCollections = 0;
 
     // Вспомогательный класс для хранения информации о регионах памяти
     private static class MemRegion {
@@ -53,14 +58,28 @@ public class MemoryUtil {
                 GarbageCollectionNotificationInfo gcInfo = GarbageCollectionNotificationInfo.from((CompositeData) notification.getUserData());
                 Map<String, MemoryUsage> memBefore = gcInfo.getGcInfo().getMemoryUsageBeforeGc();
                 Map<String, MemoryUsage> memAfter = gcInfo.getGcInfo().getMemoryUsageAfterGc();
+
+                String gcType = gcInfo.getGcAction();
+                long duration = gcInfo.getGcInfo().getDuration();
+
                 StringBuilder sb = new StringBuilder();
-                sb.append("[").append(gcInfo.getGcAction()).append(" / ").append(gcInfo.getGcCause())
+                sb.append("[").append(gcType).append(" / ").append(gcInfo.getGcCause())
                         .append(" / ").append(gcInfo.getGcName()).append(" / (");
                 appendMemUsage(sb, memBefore);
                 sb.append(") -> (");
                 appendMemUsage(sb, memAfter);
-                sb.append("), ").append(gcInfo.getGcInfo().getDuration()).append(" ms]");
+                sb.append("), ").append(duration).append(" ms]");
                 System.out.println(sb.toString());
+
+                //Подсчитываем количество сборок каждого типа и суммарное время на них
+                if (gcType.contains("minor")) {
+                    nYoungGarbageCollections++;
+                    timeToYoungGarbageCollections += duration;
+                }
+                else if (gcType.contains("major")) {
+                    nOldGarbageCollections++;
+                    timeToOldGarbageCollections += duration;
+                }
             }
         }
     };
@@ -126,7 +145,17 @@ public class MemoryUtil {
         }
     }
 
-    //Взято из примера L2.1.2 В. Чибикова
+    public static void printCountGarbageCollections() {
+        System.out.println("Count of garbage collections of young generation objects: " + nYoungGarbageCollections);
+        System.out.println("Count of garbage collections of old generation objects: " + nOldGarbageCollections);
+    }
+
+    public static void printDurationGarbageCollections() {
+        System.out.println("Duration of garbage collections of young generation objects: " + timeToYoungGarbageCollections + " ms");
+        System.out.println("Duration of garbage collections of old generation objects: " + timeToOldGarbageCollections + " ms");
+    }
+
+    //Взято из примера L2.1.2 В.Чибикова
     public static void installGCMonitoring() {
         List<GarbageCollectorMXBean> gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean gcbean : gcbeans) {

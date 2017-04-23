@@ -21,10 +21,10 @@ public class MemoryUtil {
     private static final String SPACES = "                     ";
     private static Map<String, MemRegion> memRegions;
 
-    private static int nYoungGarbageCollections = 0;
-    private static int nOldGarbageCollections = 0;
-    private static long timeToYoungGarbageCollections = 0;
-    private static long timeToOldGarbageCollections = 0;
+    public static int nYoungGarbageCollections = 0;
+    public static int nOldGarbageCollections = 0;
+    public static long timeToYoungGarbageCollections = 0;
+    public static long timeToOldGarbageCollections = 0;
 
     // Вспомогательный класс для хранения информации о регионах памяти
     private static class MemRegion {

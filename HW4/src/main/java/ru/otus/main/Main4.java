@@ -83,7 +83,6 @@ public class Main4 {
 
             System.out.println("Общее время работы приложения: " + (double) workTime / 1000 + " s");
             System.out.println("Общее время сборок мусора: " + (double) timeToGCWork / 1000 + " s");
-            System.out.println("Доля времени на сборки мусора: " + (double) timeToGCWork / workTime);
             System.out.println("Общее кол-во сборок мусора: " + (nYoungGarbageCollections+nOldGarbageCollections));
             System.out.println("Из них " + nYoungGarbageCollections + " - в YoungGeneration и");
             System.out.println(nOldGarbageCollections + " - в OldGeneration");

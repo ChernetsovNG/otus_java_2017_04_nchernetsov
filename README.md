@@ -19,4 +19,9 @@ java -javaagent:./java-2017-04-HW2-1.0-SNAPSHOT.jar -jar java-2017-04-HW
 
 -javaagent:HW2/target/java-2017-04-HW2-1.0-SNAPSHOT.jar
 
-и запускаться из IDEA
+и запускаться из IDEA.
+
+#### Комментарий по ДЗ HW4:
+
+Результаты сравнения сборщиков мусора на моей домашней конфигурации в файле
+HW4/results.txt.

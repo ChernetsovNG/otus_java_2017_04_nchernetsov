@@ -1,0 +1,38 @@
+Listening for transport dt_socket at address: 14025
+Starting pid: 25913@chernetsov
+
+Add 1000000 objects  in list
+Each second is removed
+Result size of array: 500000
+
+Par Eden Space           32.02M	23.5%	[136.50M]
+Par Survivor Space       0	0.0%	[17.06M]
+CMS Old Gen              0	0.0%	[341.38M]
+Count of garbage collections of young generation objects: 0
+Count of garbage collections of old generation objects: 0
+Duration of garbage collections of young generation objects: 0 ms
+Duration of garbage collections of old generation objects: 0 ms
+
+Add 2000000 objects  in list
+Each second is removed
+Result size of array: 1000000
+
+Par Eden Space           56.12M	41.1%	[136.50M]
+Par Survivor Space       0	0.0%	[17.06M]
+CMS Old Gen              0	0.0%	[341.38M]
+Count of garbage collections of young generation objects: 0
+Count of garbage collections of old generation objects: 0
+Duration of garbage collections of young generation objects: 0 ms
+Duration of garbage collections of old generation objects: 0 ms
+
+Add 3000000 objects  in list
+Each second is removed
+Result size of array: 1500000
+
+Par Eden Space           76.73M	56.2%	[136.50M]
+Par Survivor Space       0	0.0%	[17.06M]
+CMS Old Gen              0	0.0%	[341.38M]
+Count of garbage collections of young generation objects: 0
+Count of garbage collections of old generation objects: 0
+Duration of garbage collections of young generation objects: 0 ms
+Duration of garbage collections of old generation objects: 0 ms

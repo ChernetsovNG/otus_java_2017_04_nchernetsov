@@ -1,8 +1,10 @@
 package ru.otus;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,5 +83,22 @@ class ReflectionHelper {
     static private Class<?>[] toClasses(Object[] args) {
         List<Class<?>> classes = Arrays.stream(args).map(Object::getClass).collect(Collectors.toList());
         return classes.toArray(new Class<?>[classes.size()]);
+    }
+
+    static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
+        final List<Method> methods = new ArrayList<>();
+        Class<?> clazz = type;
+        while (clazz != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
+            // iterate though the list of methods declared in the class represented by clazz variable, and add those annotated with the specified annotation
+            final List<Method> allMethods = new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods()));
+            for (final Method method : allMethods) {
+                if (method.isAnnotationPresent(annotation)) {
+                    methods.add(method);
+                }
+            }
+            // move to the upper class in the hierarchy in search for more methods
+            clazz = clazz.getSuperclass();
+        }
+        return methods;
     }
 }

@@ -2,6 +2,10 @@ package ru.otus;
 
 import org.junit.Assert;
 import org.junit.Test;
+import ru.otus.annotation.Unfinished;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 public class ReflectionHelperTest {
     @SuppressWarnings("ConstantConditions")
@@ -33,6 +37,24 @@ public class ReflectionHelperTest {
         TestClass test = new TestClass(1, "A");
         ReflectionHelper.callMethod(test, "setDefault");
         Assert.assertEquals("", test.getS());
+    }
+
+    @Test
+    public void getMethodsAnnotatedWith() {
+        TestAnnotatedClass test = new TestAnnotatedClass();
+        List<Method> methods = ReflectionHelper.getMethodsAnnotatedWith(test.getClass(), Unfinished.class);
+        Assert.assertEquals(methods.get(0).getName(), "method2");
+    }
+
+    @Test
+    public void getAndRunMethodsAnnotatedWith() {
+        TestAnnotatedClass test = new TestAnnotatedClass();
+        List<Method> methods = ReflectionHelper.getMethodsAnnotatedWith(test.getClass(), Unfinished.class);
+
+        for (Method method : methods) {
+            String s = (String) ReflectionHelper.callMethod(test, method.getName());
+            Assert.assertEquals(s, "TestAnnotatedClass.method2 run");
+        }
     }
 
 }

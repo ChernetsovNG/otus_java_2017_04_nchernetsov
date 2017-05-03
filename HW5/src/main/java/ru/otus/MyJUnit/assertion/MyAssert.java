@@ -1,12 +1,30 @@
-package ru.otus.MyJUnit;
+package ru.otus.MyJUnit.assertion;
 
 public class MyAssert {
     public static void assertEquals(Object expected, Object actual) {
         if (equalsRegardingNull(expected, actual)) {
             return;
         } else {
-            throw new RuntimeException("Objects are not equals");
+            throw new TestException("Objects are not equals");
         }
+    }
+
+    public static void fail() {
+        throw new TestException();
+    }
+
+    public static void fail(String message) {
+        throw new TestException(message);
+    }
+
+    public static void assertTrue(boolean condition) {
+        if (!condition) {
+            fail();
+        }
+    }
+
+    public static void assertNotNull(Object object) {
+        assertTrue(object != null);
     }
 
     private static boolean equalsRegardingNull(Object expected, Object actual) {

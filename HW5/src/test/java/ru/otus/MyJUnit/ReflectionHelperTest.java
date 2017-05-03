@@ -14,6 +14,8 @@ public class ReflectionHelperTest {
         Assert.assertEquals(0, ReflectionHelper.instantiate(TestClass.class).getA());
         Assert.assertEquals(1, ReflectionHelper.instantiate(TestClass.class, 1).getA());
         Assert.assertEquals("A", ReflectionHelper.instantiate(TestClass.class, 1, "A").getS());
+
+        Assert.assertNotNull(new Integer(1));
     }
 
     @Test

@@ -1,8 +1,8 @@
-package ru.otus;
+package ru.otus.MyJUnit;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.otus.annotation.Unfinished;
+import ru.otus.MyJUnit.annotation.MyTest;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -42,14 +42,14 @@ public class ReflectionHelperTest {
     @Test
     public void getMethodsAnnotatedWith() {
         TestAnnotatedClass test = new TestAnnotatedClass();
-        List<Method> methods = ReflectionHelper.getMethodsAnnotatedWith(test.getClass(), Unfinished.class);
+        List<Method> methods = ReflectionHelper.getMethodsAnnotatedWith(test.getClass(), MyTest.class);
         Assert.assertEquals(methods.get(0).getName(), "method2");
     }
 
     @Test
     public void getAndRunMethodsAnnotatedWith() {
         TestAnnotatedClass test = new TestAnnotatedClass();
-        List<Method> methods = ReflectionHelper.getMethodsAnnotatedWith(test.getClass(), Unfinished.class);
+        List<Method> methods = ReflectionHelper.getMethodsAnnotatedWith(test.getClass(), MyTest.class);
 
         for (Method method : methods) {
             String s = (String) ReflectionHelper.callMethod(test, method.getName());

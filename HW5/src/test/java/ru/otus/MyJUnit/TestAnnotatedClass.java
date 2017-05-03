@@ -1,6 +1,6 @@
-package ru.otus;
+package ru.otus.MyJUnit;
 
-import ru.otus.annotation.Unfinished;
+import ru.otus.MyJUnit.annotation.MyTest;
 
 public class TestAnnotatedClass {
     public TestAnnotatedClass() {
@@ -9,7 +9,7 @@ public class TestAnnotatedClass {
     public void method1() {
     }
 
-    @Unfinished("Value1")
+    @MyTest
     private String method2() {
         return "TestAnnotatedClass.method2 run";
     }

@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.MyJUnit;
 
 @SuppressWarnings("unused")
 public class TestClass {

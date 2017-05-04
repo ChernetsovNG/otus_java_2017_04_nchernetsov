@@ -1,6 +1,6 @@
 package ru.otus.MyJUnit.assertion;
 
-public class TestException extends RuntimeException {
+public class TestException extends Error {
     public TestException() {
     }
 

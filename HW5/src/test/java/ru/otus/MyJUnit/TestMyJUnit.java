@@ -3,7 +3,6 @@ package ru.otus.MyJUnit;
 import ru.otus.MyJUnit.annotation.MyAfter;
 import ru.otus.MyJUnit.annotation.MyBefore;
 import ru.otus.MyJUnit.annotation.MyTest;
-import ru.otus.MyJUnit.assertion.TestException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,6 +21,7 @@ public class TestMyJUnit {
         try {
             for (Method beforeMethod : beforeMethods) {
                 ReflectionHelper.callMethod(test, beforeMethod.getName());
+                System.out.println("Run @Before");
             }
             for (Method testMethod : testMethods) {
                 ReflectionHelper.callMethod(test, testMethod.getName());
@@ -29,6 +29,7 @@ public class TestMyJUnit {
             }
             for (Method afterMethod : afterMethods) {
                 ReflectionHelper.callMethod(test, afterMethod.getName());
+                System.out.println("Run @After");
             }
             System.out.println("All tests successfully passed!");
         } catch (InvocationTargetException e) {

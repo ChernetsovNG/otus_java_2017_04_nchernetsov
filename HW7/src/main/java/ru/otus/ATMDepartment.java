@@ -1,6 +1,7 @@
 package ru.otus;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class ATMDepartment {
     private Map<Integer, ATM> atmMap = new HashMap<>();
@@ -39,12 +40,9 @@ public class ATMDepartment {
 
     //Списать сумму остатков
     int getAllATMsRemainderSum() {
-        int sum = 0;
-        for (Map.Entry<Integer, ATM> entry : atmMap.entrySet()) {
-            ATM atm = entry.getValue();
-            sum += atm.getTotalAmount();
-            atm.withdrawTotalAmount();
-        }
+        int sum = atmMap.values().stream().mapToInt(ATM::getTotalAmount).sum();
+        atmMap.values().forEach(ATM::withdrawTotalAmount);
+
         return sum;
     }
 

@@ -38,4 +38,31 @@ public class ATMDepartmentTest {
         Assert.assertEquals(0, atm2.getTotalAmount());
         Assert.assertEquals(0, atm3.getTotalAmount());
     }
+
+    @Test
+    public void loadAllATMInitialStateTest() throws NotEnoughMoneyException {
+        ATM atm1 = new ATM(1);
+        ATM atm2 = new ATM(2);
+        ATM atm3 = new ATM(3);
+
+        atm1.addAmount(100, 10);
+        atm2.addAmount(200, 3);
+        atm3.addAmount(500, 3);
+
+        ATMDepartment atmDepartment = new ATMDepartment();
+
+        atmDepartment.addATM(atm1);
+        atmDepartment.addATM(atm2);
+        atmDepartment.addATM(atm3);
+
+        atm1.withdrawAmount(500);
+        atm2.withdrawAmount(400);
+        atm3.withdrawAmount(1000);
+
+        atmDepartment.restoreATMsInitialState();
+
+        Assert.assertEquals(1000, atm1.getTotalAmount());
+        Assert.assertEquals(600, atm2.getTotalAmount());
+        Assert.assertEquals(1500, atm3.getTotalAmount());
+    }
 }

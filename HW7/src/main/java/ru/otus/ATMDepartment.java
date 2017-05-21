@@ -1,10 +1,14 @@
 package ru.otus;
 
-import java.util.*;
-import java.util.stream.Stream;
+import ru.otus.memento.Memento;
 
-public class ATMDepartment {
-    private Map<Integer, ATM> atmMap = new HashMap<>();
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
+class ATMDepartment {
+    private final Map<Integer, ATM> atmMap = new HashMap<>();
+    private final Map<Integer, Memento> atmsMemento = new HashMap<>();
 
     //создать ATM с новым id
     private ATM getNextATM() {
@@ -12,7 +16,7 @@ public class ATMDepartment {
         if (atmMap.size() == 0) {
             maxId = -1;
         } else {
-            maxId = atmMap.keySet().stream().max(Comparator.naturalOrder()).get();
+            maxId = atmMap.keySet().stream().max(Comparator.naturalOrder()).orElse(null);
         }
         return new ATM(maxId + 1);
     }
@@ -20,10 +24,12 @@ public class ATMDepartment {
     void addATM() {
         ATM atm = getNextATM();
         atmMap.put(atm.getId(), atm);
+        atmsMemento.put(atm.getId(), atm.getMemento());
     }
 
     void addATM(ATM atm) {
         atmMap.put(atm.getId(), atm);
+        atmsMemento.put(atm.getId(), atm.getMemento());
     }
 
     public void deleteATM(int id) {
@@ -44,6 +50,14 @@ public class ATMDepartment {
         atmMap.values().forEach(ATM::withdrawTotalAmount);
 
         return sum;
+    }
+
+    void restoreATMsInitialState() {
+        atmMap.values().forEach(
+                atm -> {
+                    Memento memento = atmsMemento.get(atm.getId());
+                    atm.setMemento(memento);
+                });
     }
 
 }

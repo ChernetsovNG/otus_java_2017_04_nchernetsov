@@ -1,13 +1,15 @@
 package ru.otus;
 
 import ru.otus.exception.NotEnoughMoneyException;
+import ru.otus.memento.Memento;
+import ru.otus.memento.Originator;
 import ru.otus.strategy.WithdrawAlgorithm;
 import ru.otus.strategy.WithdrawAlgorithmType;
 
 import java.util.*;
 
-public class ATM implements WithdrawAlgorithm {
-    private int id;
+public class ATM implements WithdrawAlgorithm, Originator {
+    private final int id;
     private Map<Integer, Integer> denominations = new HashMap<>();
     private WithdrawAlgorithm withdrawAlgorithm;
 
@@ -66,12 +68,26 @@ public class ATM implements WithdrawAlgorithm {
 
     int getId() { return id; }
 
+    @Override
+    public Memento getMemento() {
+        return new Memento(denominations);
+    }
+
+    @Override
+    public void setMemento(Memento memento) {
+        denominations = memento.getState();
+    }
+
     //Алгоритмы списания денег
 
     //"Жадный" алгоритм
     private class GreedyWithdrawAlgorithm implements WithdrawAlgorithm {
         @Override
         public Map<Integer, Integer> withdrawAmount(int expectedAmount) throws NotEnoughMoneyException {
+            if (expectedAmount > getTotalAmount()) {
+                throw new NotEnoughMoneyException();
+            }
+
             int amount = expectedAmount;
 
             HashMap<Integer, Integer> denomCopy = new HashMap<>();
@@ -117,6 +133,10 @@ public class ATM implements WithdrawAlgorithm {
     private class DynamicProgrammingWithdrawAlgorithm implements WithdrawAlgorithm {
         @Override
         public Map<Integer, Integer> withdrawAmount(int expectedAmount) throws NotEnoughMoneyException {
+            if (expectedAmount > getTotalAmount()) {
+                throw new NotEnoughMoneyException();
+            }
+
             Map<Integer, Integer> denomByNominalAscend = new TreeMap<>();
 
             denomByNominalAscend.putAll(denominations);

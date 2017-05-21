@@ -1,6 +1,5 @@
 package ru.otus.strategy;
 
-import ru.otus.ATM;
 import ru.otus.exception.NotEnoughMoneyException;
 
 import java.util.Map;

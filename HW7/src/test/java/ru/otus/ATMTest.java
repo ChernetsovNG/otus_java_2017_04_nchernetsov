@@ -1,8 +1,6 @@
 package ru.otus;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import ru.otus.exception.NotEnoughMoneyException;
 
@@ -12,7 +10,7 @@ import static ru.otus.strategy.WithdrawAlgorithmType.DYNAMIC_PROGRAMMING;
 
 public class ATMTest {
     @Test
-    public void Deposit3x500rubTest() {
+    public void Deposit3x500Test() {
         ATM atm = new ATM(1);
         atm.addAmount(500, 2);
         atm.addAmount(100, 5);
@@ -46,15 +44,22 @@ public class ATMTest {
     }
 
     @Test(expected = NotEnoughMoneyException.class)
-    public void GreedyNotAlwaysWorkTest() throws NotEnoughMoneyException {
+    public void WithdrawGreedyNotAlwaysWorkTest() throws NotEnoughMoneyException {
         ATM atm = new ATM(1);
         atm.addAmount(500, 2);
         atm.addAmount(200, 3);
-        Map<Integer, Integer> withdrawResult = atm.withdrawAmount(600);
+        atm.withdrawAmount(600);
+    }
+
+    @Test(expected = NotEnoughMoneyException.class)
+    public void expectedAmountMoreThenTotalTest() throws NotEnoughMoneyException {
+        ATM atm = new ATM(1);
+        atm.addAmount(500, 2);
+        atm.withdrawAmount(1200);
     }
 
     @Test
-    public void DinamicProgrammingWithdrawAlgorithmTest() throws NotEnoughMoneyException {
+    public void DynamicProgrammingWithdrawAlgorithmTest() throws NotEnoughMoneyException {
         ATM atm = new ATM(1);
         atm.addAmount(500, 2);
         atm.addAmount(200, 3);

@@ -59,7 +59,7 @@ public class ATM implements WithdrawAlgorithm, Originator {
     }
 
     boolean hasMoney() {
-        return (denominations.keySet().size() > 0);
+        return (denominations.size() > 0);
     }
 
     boolean isAmountAvailable(int expectedAmount) {

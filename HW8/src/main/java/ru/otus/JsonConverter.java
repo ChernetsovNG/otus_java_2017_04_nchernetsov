@@ -3,7 +3,9 @@ package ru.otus;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.reflect.Modifier.isStatic;
 import static ru.otus.utils.ReflectionHelper.getFieldValue;
@@ -43,7 +45,7 @@ class JsonConverter {
             } else if (field.getType().equals(String.class)) {  // строка
                 processStringField(object, sb, field);
             } else if (field.getType().isArray()) {  // массив
-                processArrayField(object, sb, field);
+                processArrayField(object, visitedObjects, sb, field);
             } else {
                 //не примитивные нестатические поля
                 if (!isStatic(field.getModifiers())) {
@@ -54,7 +56,19 @@ class JsonConverter {
                         Object linkObject = field.get(object);
                         if (linkObject != null) {
                             if (!visitedObjects.contains(linkObject)) {
-                                walkObjectByReferenceFields(linkObject, sb, visitedObjects);
+                                // Списки и множества представляем как массивы
+                                if (List.class.isAssignableFrom(linkObject.getClass())) {
+                                    visitedObjects.add(linkObject);
+                                    processListField(sb, visitedObjects, field, (List<Object>) linkObject);
+                                } else if (Set.class.isAssignableFrom(linkObject.getClass())) {
+                                    visitedObjects.add(linkObject);
+                                    processSetField(sb, visitedObjects, field, (Set<Object>) linkObject);
+                                } else {
+                                    if (!field.getName().contains("this$0")) {
+                                        printFieldName(sb, field.getName());
+                                    }
+                                    processObjectField(sb, visitedObjects, field, linkObject);
+                                }
                             }
                         }
                     } catch (IllegalAccessException e) {
@@ -69,7 +83,58 @@ class JsonConverter {
         }
     }
 
-    private void processArrayField(Object object, StringBuilder sb, Field field) {
+    private void processObjectField(StringBuilder sb, List<Object> visitedObjects, Field field, Object linkObject) {
+        if (!field.getName().contains("this$0")) {
+            sb.append("{");
+            walkObjectByReferenceFields(linkObject, sb, visitedObjects);
+            sb.append("}");
+        }
+    }
+
+    private void processListField(StringBuilder sb, List<Object> visitedObjects, Field field, List<Object> linkObject) {
+        printFieldName(sb, field.getName());
+        sb.append("[");
+        for (int i = 0; i < linkObject.size() - 1; i++) {
+            Object obj = linkObject.get(i);
+            if (isWrapperType(obj.getClass())) {
+                sb.append(obj);
+            } else {
+                processObjectField(sb, visitedObjects, field, obj);
+            }
+            sb.append(",");
+        }
+        Object obj = linkObject.get(linkObject.size() - 1);
+        if (isWrapperType(obj.getClass())) {
+            sb.append(obj);
+        } else {
+            processObjectField(sb, visitedObjects, field, obj);
+        }
+        sb.append("]");
+    }
+
+    private void processSetField(StringBuilder sb, List<Object> visitedObjects, Field field, Set<Object> linkObject) {
+        printFieldName(sb, field.getName());
+        Object[] objs = linkObject.toArray();
+        sb.append("[");
+        for (int i = 0; i < objs.length - 1; i++) {
+            Object obj = objs[i];
+            if (isWrapperType(obj.getClass())) {
+                sb.append(objs[i]);
+            } else {
+                processObjectField(sb, visitedObjects, field, obj);
+            }
+            sb.append(",");
+        }
+        Object obj = objs[objs.length-1];
+        if (isWrapperType(obj.getClass())) {
+            sb.append(obj);
+        } else {
+            processObjectField(sb, visitedObjects, field, obj);
+        }
+        sb.append("]");
+    }
+
+    private void processArrayField(Object object, List<Object> visitedObjects, StringBuilder sb, Field field) {
         String fieldName = field.getName();
         printFieldName(sb, fieldName);
         sb.append("[");
@@ -79,11 +144,21 @@ class JsonConverter {
             field.setAccessible(true);
             int length = Array.getLength(field.get(object));
             for (int i = 0; i < length - 1; i ++) {
-                Object arrayElement = Array.get(field.get(object), i);
-                sb.append(arrayElement).append(",");
+                Object obj = Array.get(field.get(object), i);
+                if (isWrapperType(obj.getClass())) {
+                    sb.append(obj);
+                } else {
+                    processObjectField(sb, visitedObjects, field, obj);
+                }
+                sb.append(",");
             }
-            Object arrayElement = Array.get(field.get(object), length - 1);
-            sb.append(arrayElement).append("]");
+            Object obj = Array.get(field.get(object), length-1);
+            if (isWrapperType(obj.getClass())) {
+                sb.append(obj);
+            } else {
+                processObjectField(sb, visitedObjects, field, obj);
+            }
+            sb.append("]");
         } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         } finally {
@@ -129,5 +204,27 @@ class JsonConverter {
         if (fields.length > 0) {
             walkObjectFields(object, fields, sb, visitedObjects);
         }
+    }
+
+    private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
+
+    private static boolean isWrapperType(Class<?> clazz)
+    {
+        return WRAPPER_TYPES.contains(clazz);
+    }
+
+    private static Set<Class<?>> getWrapperTypes()
+    {
+        Set<Class<?>> ret = new HashSet<>();
+        ret.add(Boolean.class);
+        ret.add(Character.class);
+        ret.add(Byte.class);
+        ret.add(Short.class);
+        ret.add(Integer.class);
+        ret.add(Long.class);
+        ret.add(Float.class);
+        ret.add(Double.class);
+        ret.add(Void.class);
+        return ret;
     }
 }

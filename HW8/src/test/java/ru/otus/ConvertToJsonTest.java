@@ -17,6 +17,9 @@ public class ConvertToJsonTest {
         String jsonByGson = gson.toJson(objectWithPrimitives);
         String jsonByMyConverter = jsonConverter.objectToJson(objectWithPrimitives);
 
+        System.out.println(jsonByGson);
+        System.out.println("");
+
         assertEquals(jsonByGson, jsonByMyConverter);
     }
 
@@ -27,27 +30,61 @@ public class ConvertToJsonTest {
         String jsonByGson = gson.toJson(objectWithPrimitiveArray);
         String jsonByMyConverter = jsonConverter.objectToJson(objectWithPrimitiveArray);
 
+        System.out.println(jsonByGson);
+        System.out.println("");
+
         assertEquals(jsonByGson, jsonByMyConverter);
     }
 
     @Test
-    public void GsonTest() {
-
+    public void objectWithListOfPrimitivesTest() {
         TestClasses.ClassWithListOfPrimitives objectWithListOfPrimitives = testClasses.new ClassWithListOfPrimitives();
+
+        String jsonByGson = gson.toJson(objectWithListOfPrimitives);
+        String jsonByMyConverter = jsonConverter.objectToJson(objectWithListOfPrimitives);
+
+        System.out.println(jsonByGson);
+        System.out.println("");
+
+        assertEquals(jsonByGson, jsonByMyConverter);
+    }
+
+    @Test
+    public void objectWithSetOfPrimitivesTest() {
         TestClasses.ClassWithSetOfPrimitives objectWithSetOfPrimitives = testClasses.new ClassWithSetOfPrimitives();
+
+        String jsonByGson = gson.toJson(objectWithSetOfPrimitives);
+        String jsonByMyConverter = jsonConverter.objectToJson(objectWithSetOfPrimitives);
+
+        System.out.println(jsonByGson);
+        System.out.println("");
+
+        assertEquals(jsonByGson, jsonByMyConverter);
+    }
+
+    @Test
+    public void objectWithObjectTest() {
         TestClasses.ClassWithObject objectWithObject = testClasses.new ClassWithObject();
+
+        String jsonByGson = gson.toJson(objectWithObject);
+        String jsonByMyConverter = jsonConverter.objectToJson(objectWithObject);
+
+        System.out.println(jsonByGson);
+        System.out.println("");
+
+        assertEquals(jsonByGson, jsonByMyConverter);
+    }
+
+    @Test
+    public void objectWithListOfObjectsTest() {
         TestClasses.ClassWithListOfObjects objectWithListOfObjects = testClasses.new ClassWithListOfObjects();
 
+        String jsonByGson = gson.toJson(objectWithListOfObjects);
+        String jsonByMyConverter = jsonConverter.objectToJson(objectWithListOfObjects);
 
-        String jsonClassWithListOfPrimitives = gson.toJson(objectWithListOfPrimitives);
-        String jsonClassWithSetOfPrimitives = gson.toJson(objectWithSetOfPrimitives);
-        String jsonClassWithObject = gson.toJson(objectWithObject);
-        String jsonClassWithListOfObjects = gson.toJson(objectWithListOfObjects);
+        System.out.println(jsonByGson);
+        System.out.println("");
 
-
-        System.out.println(jsonClassWithListOfPrimitives);
-        System.out.println(jsonClassWithSetOfPrimitives);
-        System.out.println(jsonClassWithObject);
-        System.out.println(jsonClassWithListOfObjects);
+        assertEquals(jsonByGson, jsonByMyConverter);
     }
 }

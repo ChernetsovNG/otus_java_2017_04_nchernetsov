@@ -47,37 +47,41 @@ class JsonConverter {
             } else if (field.getType().isArray()) {  // массив
                 processArrayField(object, visitedObjects, sb, field);
             } else {
-                //не примитивные нестатические поля
-                if (!isStatic(field.getModifiers())) {
-                    boolean isAccessible = true;
-                    try {
-                        isAccessible = field.isAccessible();
-                        field.setAccessible(true);
-                        Object linkObject = field.get(object);
-                        if (linkObject != null) {
-                            if (!visitedObjects.contains(linkObject)) {
-                                // Списки и множества представляем как массивы
-                                if (List.class.isAssignableFrom(linkObject.getClass())) {
-                                    visitedObjects.add(linkObject);
-                                    processListField(sb, visitedObjects, field, (List<Object>) linkObject);
-                                } else if (Set.class.isAssignableFrom(linkObject.getClass())) {
-                                    visitedObjects.add(linkObject);
-                                    processSetField(sb, visitedObjects, field, (Set<Object>) linkObject);
-                                } else {
-                                    if (!field.getName().contains("this$0")) {
-                                        printFieldName(sb, field.getName());
-                                    }
-                                    processObjectField(sb, visitedObjects, field, linkObject);
-                                }
+                processNonPrimitiveField(object, sb, visitedObjects, field);
+            }
+        }
+    }
+
+    private void processNonPrimitiveField(Object object, StringBuilder sb, List<Object> visitedObjects, Field field) {
+        //не примитивные нестатические поля
+        if (!isStatic(field.getModifiers())) {
+            boolean isAccessible = true;
+            try {
+                isAccessible = field.isAccessible();
+                field.setAccessible(true);
+                Object linkObject = field.get(object);
+                if (linkObject != null) {
+                    if (!visitedObjects.contains(linkObject)) {
+                        // Списки и множества представляем как массивы
+                        if (List.class.isAssignableFrom(linkObject.getClass())) {
+                            visitedObjects.add(linkObject);
+                            processListField(sb, visitedObjects, field, (List<Object>) linkObject);
+                        } else if (Set.class.isAssignableFrom(linkObject.getClass())) {
+                            visitedObjects.add(linkObject);
+                            processSetField(sb, visitedObjects, field, (Set<Object>) linkObject);
+                        } else {
+                            if (!field.getName().contains("this$0")) {
+                                printFieldName(sb, field.getName());
                             }
-                        }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (!isAccessible) {
-                            field.setAccessible(false);
+                            processObjectField(sb, visitedObjects, field, linkObject);
                         }
                     }
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } finally {
+                if (!isAccessible) {
+                    field.setAccessible(false);
                 }
             }
         }
@@ -92,10 +96,24 @@ class JsonConverter {
     }
 
     private void processListField(StringBuilder sb, List<Object> visitedObjects, Field field, List<Object> linkObject) {
+        processCollectionField(sb, visitedObjects, field, linkObject.toArray());
+    }
+
+    private void processSetField(StringBuilder sb, List<Object> visitedObjects, Field field, Set<Object> linkObject) {
+        Object[] objects = linkObject.toArray();
+        processCollectionField(sb, visitedObjects, field, objects);
+    }
+
+    private void processCollectionField(StringBuilder sb, List<Object> visitedObjects, Field field, Object[] array) {
         printFieldName(sb, field.getName());
         sb.append("[");
-        for (int i = 0; i < linkObject.size() - 1; i++) {
-            Object obj = linkObject.get(i);
+        processCollectionAsArray(sb, visitedObjects, field, array);
+        sb.append("]");
+    }
+
+    private void processCollectionAsArray(StringBuilder sb, List<Object> visitedObjects, Field field, Object[] array) {
+        for (int i = 0; i < array.length-1; i++) {
+            Object obj = array[i];
             if (isWrapperType(obj.getClass())) {
                 sb.append(obj);
             } else {
@@ -103,35 +121,12 @@ class JsonConverter {
             }
             sb.append(",");
         }
-        Object obj = linkObject.get(linkObject.size() - 1);
+        Object obj = array[array.length-1];
         if (isWrapperType(obj.getClass())) {
             sb.append(obj);
         } else {
             processObjectField(sb, visitedObjects, field, obj);
         }
-        sb.append("]");
-    }
-
-    private void processSetField(StringBuilder sb, List<Object> visitedObjects, Field field, Set<Object> linkObject) {
-        printFieldName(sb, field.getName());
-        Object[] objs = linkObject.toArray();
-        sb.append("[");
-        for (int i = 0; i < objs.length - 1; i++) {
-            Object obj = objs[i];
-            if (isWrapperType(obj.getClass())) {
-                sb.append(objs[i]);
-            } else {
-                processObjectField(sb, visitedObjects, field, obj);
-            }
-            sb.append(",");
-        }
-        Object obj = objs[objs.length-1];
-        if (isWrapperType(obj.getClass())) {
-            sb.append(obj);
-        } else {
-            processObjectField(sb, visitedObjects, field, obj);
-        }
-        sb.append("]");
     }
 
     private void processArrayField(Object object, List<Object> visitedObjects, StringBuilder sb, Field field) {

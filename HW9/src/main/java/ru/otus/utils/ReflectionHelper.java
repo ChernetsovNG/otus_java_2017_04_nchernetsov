@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("SameParameterValue")
-class ReflectionHelper {
+public class ReflectionHelper {
     private ReflectionHelper() {
     }
 
-    static <T> T instantiate(Class<T> type, Object... args) {
+    public static <T> T instantiate(Class<T> type, Object... args) {
         try {
             if (args.length == 0) {
                 return type.newInstance();
@@ -45,7 +45,7 @@ class ReflectionHelper {
         return null;
     }
 
-    static void setFieldValue(Object object, String name, Object value) {
+    public static void setFieldValue(Object object, String name, Object value) {
         Field field = null;
         boolean isAccessible = true;
         try {

@@ -40,4 +40,16 @@ public class ORMTest {
         }
     }
 
+    @Test
+    public void loadUserTest() {
+        orm.save(new User(2, "User2", 2));
+        orm.save(new User(3, "User3", 3));
+
+        User user2 = orm.load(2, User.class);
+        User user3 = orm.load(3, User.class);
+
+        assertEquals("User2", user2.getName());
+        assertEquals("User3", user3.getName());
+    }
+
 }

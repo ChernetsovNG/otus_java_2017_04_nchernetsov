@@ -10,7 +10,7 @@ import javax.persistence.Table;
 public class User {
     @Id
     @Column(name = "id", nullable = false)
-    private int id;
+    private long id;
 
     @Column(name = "name")
     private String name;
@@ -21,13 +21,13 @@ public class User {
     public User() {
     }
 
-    public User(int id, String name, int age) {
+    public User(long id, String name, int age) {
         this.id = id;
         this.name = name;
         this.age = age;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -37,5 +37,14 @@ public class User {
 
     public int getAge() {
         return age;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", age=" + age +
+            '}';
     }
 }

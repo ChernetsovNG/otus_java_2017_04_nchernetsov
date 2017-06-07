@@ -97,13 +97,12 @@ public class ORM implements Executor {
         Object[] columns = classFieldColumnNameMap.values().toArray();  // столбцы таблицы
 
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ");
 
+        sb.append("SELECT ");
         for (int i = 0; i < columns.length-1; i++) {
             sb.append((String) columns[i]).append(", ");
         }
         sb.append((String) columns[columns.length-1]).append(" ");
-
         sb.append("FROM ").append(tableName).append(" ")
             .append("WHERE id = ").append(id).append(";");
 

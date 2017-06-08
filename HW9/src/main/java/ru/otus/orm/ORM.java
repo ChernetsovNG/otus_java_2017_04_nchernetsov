@@ -25,7 +25,7 @@ public class ORM implements Executor {
     // Карта вида (Класс - Имя таблицы в БД)
     private final Map<Class<?>, String> tableNames = new HashMap<>();
     // Карта вида (Класс - Карта (поле класса - столбец в таблице))
-    private final Map<Class<?>, Map<String, String>> matchClassFieldsAndTablesColumnMap = new HashMap<>();
+    private final Map<Class<?>, DataSetDescriptor> matchClassFieldsAndTablesColumnMap = new HashMap<>();
 
     ORM() {
         connection = ConnectionHelper.getConnection();
@@ -43,7 +43,7 @@ public class ORM implements Executor {
             tableNames.put(annotatedClass, annotationTable.name());
 
             // Поля класса и соответствующие столбцы таблицы
-            Map<String, String> classFieldColumnNameMap = new HashMap<>();
+            DataSetDescriptor classFieldColumnNameMap = new DataSetDescriptor();
 
             for (Field field : annotatedClass.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Column.class)) {
@@ -67,9 +67,11 @@ public class ORM implements Executor {
         // Имя таблицы в БД, соответствующей сущности User
         String tableName = tableNames.get(User.class);
         // Находим имена столбцов в таблице БД, соответствующие полям класса User
-        String idColumnName = matchClassFieldsAndTablesColumnMap.get(User.class).get("id");
-        String nameColumnName = matchClassFieldsAndTablesColumnMap.get(User.class).get("name");
-        String ageColumnName = matchClassFieldsAndTablesColumnMap.get(User.class).get("age");
+        DataSetDescriptor userDescriptor = matchClassFieldsAndTablesColumnMap.get(User.class);
+
+        String idColumnName = userDescriptor.get("id");
+        String nameColumnName = userDescriptor.get("name");
+        String ageColumnName = userDescriptor.get("age");
 
         String query = "INSERT INTO " + tableName + " (" +
             idColumnName + ", " +
@@ -92,7 +94,7 @@ public class ORM implements Executor {
     public User load(long id, Class<?> clazz) {
         String tableName = tableNames.get(clazz);
 
-        Map<String, String> classFieldColumnNameMap = matchClassFieldsAndTablesColumnMap.get(clazz);
+        DataSetDescriptor classFieldColumnNameMap = matchClassFieldsAndTablesColumnMap.get(clazz);
 
         Object[] columns = classFieldColumnNameMap.values().toArray();  // столбцы таблицы
 

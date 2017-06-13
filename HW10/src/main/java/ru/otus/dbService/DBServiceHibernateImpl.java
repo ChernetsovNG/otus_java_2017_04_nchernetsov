@@ -7,6 +7,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import ru.otus.base.DBService;
+import ru.otus.base.dataSets.AddressDataSet;
 import ru.otus.base.dataSets.PhoneDataSet;
 import ru.otus.base.dataSets.UserDataSet;
 import ru.otus.dbService.dao.UserDataSetDAO;
@@ -23,11 +24,12 @@ public class DBServiceHibernateImpl implements DBService {
 
         configuration.addAnnotatedClass(UserDataSet.class);
         configuration.addAnnotatedClass(PhoneDataSet.class);
+        configuration.addAnnotatedClass(AddressDataSet.class);
 
         configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         configuration.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
         configuration.setProperty("hibernate.connection.url", "jdbc:h2:mem:HW10_database");
-        configuration.setProperty("hibernate.show_sql", "false");
+        configuration.setProperty("hibernate.show_sql", "true");
         configuration.setProperty("hibernate.hbm2ddl.auto", "create");
         configuration.setProperty("hibernate.connection.useSSL", "false");
         configuration.setProperty("hibernate.enable_lazy_load_no_trans", "true");

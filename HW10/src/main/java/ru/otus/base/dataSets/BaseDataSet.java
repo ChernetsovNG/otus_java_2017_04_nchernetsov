@@ -3,7 +3,7 @@ package ru.otus.base.dataSets;
 import javax.persistence.*;
 
 @MappedSuperclass
-public class DataSet {
+public class BaseDataSet {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

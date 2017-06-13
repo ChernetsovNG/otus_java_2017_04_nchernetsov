@@ -6,7 +6,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "phones")
-public class PhoneDataSet extends DataSet {
+public class PhoneDataSet extends BaseDataSet {
+
+    @Column(name = "code")
+    private int code;
 
     @Column(name = "number")
     private String number;
@@ -14,7 +17,8 @@ public class PhoneDataSet extends DataSet {
     public PhoneDataSet() {
     }
 
-    public PhoneDataSet(String number) {
+    public PhoneDataSet(int code, String number) {
+        this.code = code;
         this.number = number;
     }
 
@@ -22,10 +26,15 @@ public class PhoneDataSet extends DataSet {
         return number;
     }
 
+    public int getCode() {
+        return code;
+    }
+
     @Override
     public String toString() {
         return "PhoneDataSet{" +
-            "number='" + number + '\'' +
-            '}';
+            "code=" + code +
+            ", number='" + number + '\'' +
+            "} " + super.toString();
     }
 }

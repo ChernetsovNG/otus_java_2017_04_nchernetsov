@@ -1,31 +1,32 @@
 package ru.otus.base.dataSets;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class UserDataSet extends DataSet {
+public class UserDataSet extends BaseDataSet {
 
     @Column(name = "name")
     private String name;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private PhoneDataSet phone;
+    private AddressDataSet address;
 
-    //Important for Hibernate
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "phones",
+        joinColumns = {@JoinColumn(name = "user_id", nullable = false)},
+        inverseJoinColumns = {@JoinColumn(name = "id")})
+    private List<PhoneDataSet> phones = new ArrayList<>();
+
     public UserDataSet() {
     }
 
-    public UserDataSet(long id, String name, PhoneDataSet phone) {
-        this.setId(id);
+    public UserDataSet(String name, AddressDataSet address, List<PhoneDataSet> phones) {
         this.setName(name);
-        this.setPhone(phone);
-    }
-
-    public UserDataSet(String name, PhoneDataSet phone) {
-        this.setId(-1);
-        this.setName(name);
-        this.setPhone(phone);
+        this.setAddress(address);
+        this.setPhones(phones);
     }
 
     public String getName() {
@@ -36,15 +37,28 @@ public class UserDataSet extends DataSet {
         this.name = name;
     }
 
-    public void setPhone(PhoneDataSet phone) {
-        this.phone = phone;
+    public void setAddress(AddressDataSet address) {
+        this.address = address;
+    }
+
+    public void setPhones(List<PhoneDataSet> phones) {
+        this.phones = phones;
+    }
+
+    public AddressDataSet getAddress() {
+        return address;
+    }
+
+    public List<PhoneDataSet> getPhones() {
+        return phones;
     }
 
     @Override
     public String toString() {
         return "UserDataSet{" +
             "name='" + name + '\'' +
-            ", phone=" + phone +
-            '}';
+            ", address=" + address +
+            ", phones=" + phones +
+            "} " + super.toString();
     }
 }

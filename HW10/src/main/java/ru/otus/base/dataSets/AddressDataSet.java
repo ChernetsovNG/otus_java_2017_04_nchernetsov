@@ -17,6 +17,11 @@ public class AddressDataSet extends BaseDataSet {
     }
 
     public AddressDataSet(String street, int index) {
+        this(null, street, index);
+    }
+
+    public AddressDataSet(Long id, String street, int index) {
+        super(id);
         this.street = street;
         this.index = index;
     }

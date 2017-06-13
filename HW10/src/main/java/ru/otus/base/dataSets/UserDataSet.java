@@ -14,9 +14,9 @@ public class UserDataSet extends BaseDataSet {
     @OneToOne(cascade = CascadeType.ALL)
     private AddressDataSet address;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "phones",
-        joinColumns = {@JoinColumn(name = "user_id", nullable = false)},
+        joinColumns = {@JoinColumn(name = "user_id")},
         inverseJoinColumns = {@JoinColumn(name = "id")})
     private List<PhoneDataSet> phones = new ArrayList<>();
 

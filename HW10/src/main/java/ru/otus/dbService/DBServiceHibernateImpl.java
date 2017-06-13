@@ -34,7 +34,7 @@ public class DBServiceHibernateImpl implements DBService {
         configuration.setProperty("hibernate.connection.useSSL", "false");
         configuration.setProperty("hibernate.enable_lazy_load_no_trans", "true");
 
-        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
+        //java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
 
         sessionFactory = createSessionFactory(configuration);
     }

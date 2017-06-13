@@ -34,10 +34,11 @@ public class DBServiceTest {
 
     @Test
     public void saveAndReadTest() throws Exception {
-        dbService.save(new UserDataSet("tully",
+        UserDataSet userDataSet = new UserDataSet("tully",
             new AddressDataSet("Lebedeva, 14", 164502),
-            Arrays.asList(new PhoneDataSet(965, "12345")))
-        );
+            Arrays.asList(new PhoneDataSet(965, "12345")));
+
+        dbService.save(userDataSet);
         UserDataSet dataSet = dbService.readByName("tully");
         assertEquals("tully", dataSet.getName());
     }

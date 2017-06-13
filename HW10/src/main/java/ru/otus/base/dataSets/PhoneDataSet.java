@@ -7,7 +7,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "phones")
 public class PhoneDataSet extends BaseDataSet {
-
     @Column(name = "code")
     private int code;
 
@@ -18,6 +17,11 @@ public class PhoneDataSet extends BaseDataSet {
     }
 
     public PhoneDataSet(int code, String number) {
+        this(null, code, number);
+    }
+
+    public PhoneDataSet(Long id, int code, String number) {
+        super(id);
         this.code = code;
         this.number = number;
     }

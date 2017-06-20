@@ -16,6 +16,7 @@ import ru.otus.dbService.dao.UserDataSetDAO;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class DBServiceHibernateImpl implements DBService {
@@ -37,7 +38,7 @@ public class DBServiceHibernateImpl implements DBService {
         configuration.setProperty("hibernate.connection.useSSL", "false");
         configuration.setProperty("hibernate.enable_lazy_load_no_trans", "true");
 
-        //java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
+        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
 
         sessionFactory = createSessionFactory(configuration);
 
@@ -109,6 +110,9 @@ public class DBServiceHibernateImpl implements DBService {
     public void deleteUserById(long id) {
         runInSession(session -> {
             UserDataSetDAO dao = new UserDataSetDAO(session);
+            // Удаляем запись из кеша
+            cache.removeElement(id);
+            // Удаляем из базы
             dao.deleteUserById(id);
             return null;
         });
@@ -136,10 +140,11 @@ public class DBServiceHibernateImpl implements DBService {
 
     @Override
     public int[] getCacheStats() {
-        int[] res = new int[2];
+        int[] res = new int[3];
 
         res[0] = cache.getHitCount();
         res[1] = cache.getMissCount();
+        res[2] = cache.getElementsCount();
 
         return res;
     }

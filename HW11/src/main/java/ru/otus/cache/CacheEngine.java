@@ -7,11 +7,15 @@ public interface CacheEngine<K, V> {
 
     Element<K, V> get(K key);
 
+    void removeElement(K key);
+
     List<Element<K, V>> getAll();
 
     int getHitCount();
 
     int getMissCount();
+
+    int getElementsCount();
 
     void dispose();
 }

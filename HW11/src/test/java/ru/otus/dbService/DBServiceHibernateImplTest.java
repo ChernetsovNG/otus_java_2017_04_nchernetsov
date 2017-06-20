@@ -1,13 +1,12 @@
 package ru.otus.dbService;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import ru.otus.base.dataSets.AddressDataSet;
 import ru.otus.base.dataSets.PhoneDataSet;
 import ru.otus.base.dataSets.UserDataSet;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -16,13 +15,13 @@ import static org.junit.Assert.*;
 public class DBServiceHibernateImplTest {
     private static DBService dbService;
 
-    @BeforeClass
-    public static void createDBService() {
+    @Before
+    public void createDBService() {
         dbService = new DBServiceHibernateImpl();
     }
 
-    @AfterClass
-    public static void shutdownDBService() {
+    @After
+    public void shutdownDBService() {
         dbService.shutdown();
     }
 
@@ -30,15 +29,15 @@ public class DBServiceHibernateImplTest {
     public void saveAndReadTest() throws Exception {
         UserDataSet userDataSet1 = new UserDataSet("User 1",
             new AddressDataSet("Street 1", 1),
-            Arrays.asList(new PhoneDataSet(1, "1")));
+            Collections.singletonList(new PhoneDataSet(1, "1")));
 
         UserDataSet userDataSet2 = new UserDataSet("User 2",
             new AddressDataSet("Street 2", 2),
-            Arrays.asList(new PhoneDataSet(2, "2")));
+            Collections.singletonList(new PhoneDataSet(2, "2")));
 
         UserDataSet userDataSet3 = new UserDataSet("User 3",
             new AddressDataSet("Street 3", 3),
-            Arrays.asList(new PhoneDataSet(3, "3")));
+            Collections.singletonList(new PhoneDataSet(3, "3")));
 
         dbService.save(userDataSet1);
         dbService.save(userDataSet2);
@@ -50,13 +49,14 @@ public class DBServiceHibernateImplTest {
 
         assertEquals(3, dbService.getCacheStats()[0]);
         assertEquals(0, dbService.getCacheStats()[1]);
+        assertEquals(3, dbService.getCacheStats()[2]);
     }
 
     @Test
-    public void removeElementFromCacheByTimeTest() throws Exception {
+    public void removeElementFromCacheByLifeTimeTest() throws Exception {
         UserDataSet userDataSet1 = new UserDataSet("User 1",
             new AddressDataSet("Street 1", 1),
-            Arrays.asList(new PhoneDataSet(1, "1")));
+            Collections.singletonList(new PhoneDataSet(1, "1")));
 
         dbService.save(userDataSet1);
 
@@ -64,27 +64,28 @@ public class DBServiceHibernateImplTest {
 
         assertEquals(1, dbService.getCacheStats()[0]);
 
-        TimeUnit.MILLISECONDS.sleep(3200);
+        TimeUnit.MILLISECONDS.sleep(3200);  // элементы в кеше "живут" 3 секунды
 
         dbService.read(1);
 
         assertEquals(1, dbService.getCacheStats()[0]);
         assertEquals(1, dbService.getCacheStats()[1]);
+        assertEquals(0, dbService.getCacheStats()[2]);  //кол-во элементов = 0
     }
 
     @Test
     public void readAllFromCacheTest() throws Exception {
         UserDataSet userDataSet1 = new UserDataSet("User 1",
             new AddressDataSet("Street 1", 1),
-            Arrays.asList(new PhoneDataSet(1, "1")));
+            Collections.singletonList(new PhoneDataSet(1, "1")));
 
         UserDataSet userDataSet2 = new UserDataSet("User 2",
             new AddressDataSet("Street 2", 2),
-            Arrays.asList(new PhoneDataSet(2, "2")));
+            Collections.singletonList(new PhoneDataSet(2, "2")));
 
         UserDataSet userDataSet3 = new UserDataSet("User 3",
             new AddressDataSet("Street 3", 3),
-            Arrays.asList(new PhoneDataSet(3, "3")));
+            Collections.singletonList(new PhoneDataSet(3, "3")));
 
         dbService.save(userDataSet1);
         dbService.save(userDataSet2);
@@ -96,5 +97,31 @@ public class DBServiceHibernateImplTest {
 
         assertEquals(3, dbService.getCacheStats()[0]);
         assertEquals(0, dbService.getCacheStats()[1]);
+        assertEquals(3, dbService.getCacheStats()[2]);
+    }
+
+    @Test
+    public void removeElementFromCacheTest() {
+        UserDataSet userDataSet1 = new UserDataSet("User 1",
+            new AddressDataSet("Street 1", 1),
+            Collections.singletonList(new PhoneDataSet(1, "1")));
+
+        UserDataSet userDataSet2 = new UserDataSet("User 2",
+            new AddressDataSet("Street 2", 2),
+            Collections.singletonList(new PhoneDataSet(2, "2")));
+
+        UserDataSet userDataSet3 = new UserDataSet("User 3",
+            new AddressDataSet("Street 3", 3),
+            Collections.singletonList(new PhoneDataSet(3, "3")));
+
+        dbService.save(userDataSet1);
+        dbService.save(userDataSet2);
+        dbService.save(userDataSet3);
+
+        assertEquals(3, dbService.getCacheStats()[2]);
+
+        dbService.deleteUserById(1);  // здесь удаляем элемент также из кеша
+
+        assertEquals(2, dbService.getCacheStats()[2]);
     }
 }

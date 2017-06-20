@@ -15,7 +15,11 @@ public interface DBService {
 
     List<UserDataSet> readAll();
 
+    List<UserDataSet> readAllFromCache();
+
     void deleteUserById(long id);
 
     void shutdown();
+
+    int[] getCacheStats();
 }

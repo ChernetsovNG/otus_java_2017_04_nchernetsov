@@ -50,7 +50,15 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
 
     @Override
     public Element<K, V> get(K key) {
-        Element<K, V> element = elements.get(key).get();
+        SoftReference<Element<K, V>> elementSoftReference = elements.get(key);
+        Element<K, V> element;
+
+        if (elementSoftReference != null) {
+            element = elementSoftReference.get();
+        } else {
+            element = null;
+        }
+
         if (element != null) {
             hit++;
             element.setAccessed();
@@ -62,7 +70,15 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
 
     @Override
     public List<Element<K, V>> getAll() {
-        return elements.values().stream().map(SoftReference::get).collect(Collectors.toList());
+        return elements.values().stream()
+            .filter(e -> {
+                boolean eNotNull = e != null;
+                if (eNotNull) {
+                    hit++;
+                }
+                return eNotNull;
+            })
+            .map(SoftReference::get).collect(Collectors.toList());
     }
 
     @Override

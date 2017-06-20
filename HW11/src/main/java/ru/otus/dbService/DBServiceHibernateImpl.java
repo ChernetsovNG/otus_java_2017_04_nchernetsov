@@ -16,6 +16,7 @@ import ru.otus.dbService.dao.UserDataSetDAO;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DBServiceHibernateImpl implements DBService {
     private final SessionFactory sessionFactory;
@@ -41,7 +42,7 @@ public class DBServiceHibernateImpl implements DBService {
         sessionFactory = createSessionFactory(configuration);
 
         // Создаём кеш
-        cache = new CacheEngineImpl<>(5, 10_000, 0, false);
+        cache = new CacheEngineImpl<>(5, 3_000, 0, false);
     }
 
     public String getLocalStatus() {
@@ -51,14 +52,22 @@ public class DBServiceHibernateImpl implements DBService {
     public void save(UserDataSet dataSet) {
         try (Session session = sessionFactory.openSession()) {
             UserDataSetDAO dao = new UserDataSetDAO(session);
-            cache.put(new Element<>(dataSet.getId(), dataSet));  // добавляем элемент в кеш
             dao.save(dataSet);
+            cache.put(new Element<>(dataSet.getId(), dataSet));  // добавляем элемент в кеш
         }
     }
 
     public UserDataSet read(long id) {
         // сперва ищем в кеше, если там нет, то обращаемся к базе
-        UserDataSet userFromCache = cache.get(id).getValue();
+        Element<Long, UserDataSet> element = cache.get(id);
+
+        UserDataSet userFromCache;
+        if (element != null) {
+            userFromCache = element.getValue();
+        } else {
+            userFromCache = null;
+        }
+
         if (userFromCache != null) {
             return userFromCache;
         } else {
@@ -83,6 +92,11 @@ public class DBServiceHibernateImpl implements DBService {
             UserDataSetDAO dao = new UserDataSetDAO(session);
             return dao.readByName(name);
         });
+    }
+
+    public List<UserDataSet> readAllFromCache() {
+        List<Element<Long, UserDataSet>> elementsFromCache = cache.getAll();
+        return elementsFromCache.stream().map(Element::getValue).collect(Collectors.toList());
     }
 
     public List<UserDataSet> readAll() {
@@ -118,5 +132,15 @@ public class DBServiceHibernateImpl implements DBService {
         builder.applySettings(configuration.getProperties());
         ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
+    }
+
+    @Override
+    public int[] getCacheStats() {
+        int[] res = new int[2];
+
+        res[0] = cache.getHitCount();
+        res[1] = cache.getMissCount();
+
+        return res;
     }
 }

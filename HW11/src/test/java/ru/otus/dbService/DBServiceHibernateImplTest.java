@@ -124,4 +124,17 @@ public class DBServiceHibernateImplTest {
 
         assertEquals(2, dbService.getCacheStats()[2]);
     }
+
+    @Test
+    public void overflowCacheTest() {
+        for (int i = 1; i <= 6; i++) {
+            UserDataSet userDataSet = new UserDataSet("User " + i,
+                new AddressDataSet("Street " + i, i),
+                Collections.singletonList(new PhoneDataSet(i, String.valueOf(i))));
+
+            dbService.save(userDataSet);
+        }
+        assertEquals(5, dbService.getCacheStats()[2]);
+    }
+
 }

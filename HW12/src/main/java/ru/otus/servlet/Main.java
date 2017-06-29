@@ -37,7 +37,7 @@ public class Main {
         dbService.read(2);
 
         context.addServlet(new ServletHolder(new AuthServlet("unknown", "unknown")), "/auth");
-        context.addServlet(new ServletHolder(new CacheInfoServlet(dbService.getCacheStats())), "/cache_info");
+        context.addServlet(new ServletHolder(new CacheInfoServlet(dbService)), "/cache_info");
 
         Server server = new Server(PORT);
 

@@ -24,7 +24,7 @@ public class DBServiceHibernateImpl implements DBService {
     private final CacheEngine<Long, UserDataSet> cache;
 
     private static final int MAX_ELEMENTS = 5;
-    private static final int LIFE_TIME_MS = 0;
+    private static final int LIFE_TIME_MS = 5_000;
     private static final int IDLE_TIME_MS = 0;
 
     public DBServiceHibernateImpl() {
@@ -47,7 +47,7 @@ public class DBServiceHibernateImpl implements DBService {
         sessionFactory = createSessionFactory(configuration);
 
         // Создаём кеш
-        cache = new CacheEngineImpl<>(MAX_ELEMENTS, LIFE_TIME_MS, IDLE_TIME_MS, true);
+        cache = new CacheEngineImpl<>(MAX_ELEMENTS, LIFE_TIME_MS, IDLE_TIME_MS, false);
     }
 
     public String getLocalStatus() {

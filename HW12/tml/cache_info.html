@@ -2,10 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8"/>
-    <meta http-equiv="Refresh" content="2">  <!--Обновляем страницу раз в 2 секунды-->
     <title>Cache info</title>
+    <script src="js/serverdata.js"></script>
 </head>
-<body>
+<body onload="setInterval(function() {refresh()}, 1000); refresh();">
 <div class="top">
     <br/>
     <a href="auth">Back to auth page</a>
@@ -13,11 +13,13 @@
 
 <p>Cache statistics: </p>
 
-<p>Hit count: ${hit_count}</p>
+<p>Hit count: <span id='hit_count'></span></p>
 
-<p>Miss count: ${miss_count}</p>
+<p>Miss count: <span id='miss_count'></span></p>
 
-<p>Element count: ${element_count}</p>
+<p>Element count: <span id='element_count'></span></p>
+
+<p>Server time: <span id='ServerTime'></span></p>
 
 </body>
 </html>

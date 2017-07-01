@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,9 +28,10 @@ public class CacheInfoServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Map<String, Object> pageVariables = createPageVariablesMap();
+        Map<String, Object> pageVariables = createCacheVariablesMap();
+        pageVariables.put("time", getTime());
 
-        response.getWriter().println(TemplateProcessor.instance().getPage(CACHE_INFO_PAGE_TEMPLATE, pageVariables));
+        response.getWriter().println(TemplateProcessor.instance().getPage("server-data.json", pageVariables));
 
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -44,7 +48,8 @@ public class CacheInfoServlet extends HttpServlet {
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION);
         } else {
-            Map<String, Object> pageVariables = createPageVariablesMap();
+            Map<String, Object> pageVariables = createCacheVariablesMap();
+            pageVariables.put("time", getTime());
 
             response.getWriter().println(TemplateProcessor.instance().getPage(CACHE_INFO_PAGE_TEMPLATE, pageVariables));
 
@@ -53,7 +58,7 @@ public class CacheInfoServlet extends HttpServlet {
         }
     }
 
-    private Map<String, Object> createPageVariablesMap() {
+    private Map<String, Object> createCacheVariablesMap() {
         Map<String, Object> pageVariables = new HashMap<>();
 
         int[] cacheStats = dbService.getCacheStats();
@@ -63,6 +68,13 @@ public class CacheInfoServlet extends HttpServlet {
         pageVariables.put("element_count", cacheStats[2]);
 
         return pageVariables;
+    }
+
+    private static String getTime() {
+        Date date = new Date();
+        date.getTime();
+        DateFormat formatter = new SimpleDateFormat("HH.mm.ss");
+        return formatter.format(date);
     }
 
 }

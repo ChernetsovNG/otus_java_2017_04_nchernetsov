@@ -123,10 +123,13 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
         return new TimerTask() {
             @Override
             public void run() {
-                Element<K, V> checkedElement = elements.get(key).get();
-                if (checkedElement == null ||
-                    isT1BeforeT2(timeFunction.apply(checkedElement), checkedElement.getCurrentTime())) {
-                    elements.remove(key);
+                SoftReference<Element<K, V>> softReference = elements.get(key);
+                if (softReference != null) {
+                    Element<K, V> checkedElement = softReference.get();
+                    if (checkedElement == null ||
+                        isT1BeforeT2(timeFunction.apply(checkedElement), checkedElement.getCurrentTime())) {
+                        elements.remove(key);
+                    }
                 }
             }
         };

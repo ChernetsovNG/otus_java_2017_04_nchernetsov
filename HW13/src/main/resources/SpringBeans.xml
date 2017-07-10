@@ -8,7 +8,7 @@
 
     <bean id="cacheInfoService" class="ru.otus.service.CacheInfoService">
         <constructor-arg name="pattern" value="HH-mm-ss" />
-        <constructor-arg name="dbService" value="dbService" />
+        <constructor-arg name="dbService" ref="dbService" />
     </bean>
 
 </beans>

@@ -10,10 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 public class CacheInfoServlet extends HttpServlet {
@@ -34,7 +30,7 @@ public class CacheInfoServlet extends HttpServlet {
 
     public void init(){
         //TODO: Create one context for the application. Pass context as a parameter.
-        ApplicationContext context = new ClassPathXmlApplicationContext("SpringBeans.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("WEB-INF/SpringBeans.xml");
 
         dbService = (DBService) context.getBean("dbService");
         cacheInfoService = (CacheInfoService) context.getBean("cacheInfoService");

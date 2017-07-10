@@ -1,0 +1,6 @@
+{
+  "hit_count": "${hit_count}",
+  "miss_count": "${miss_count}",
+  "element_count": "${element_count}",
+  "time": "${time}"
+}

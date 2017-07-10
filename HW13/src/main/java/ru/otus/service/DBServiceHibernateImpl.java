@@ -1,4 +1,4 @@
-package ru.otus.dbService;
+package ru.otus.service;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,7 +12,7 @@ import ru.otus.base.dataSets.UserDataSet;
 import ru.otus.cache.CacheEngine;
 import ru.otus.cache.CacheEngineImpl;
 import ru.otus.cache.Element;
-import ru.otus.dbService.dao.UserDataSetDAO;
+import ru.otus.service.dao.UserDataSetDAO;
 
 import java.util.List;
 import java.util.function.Function;

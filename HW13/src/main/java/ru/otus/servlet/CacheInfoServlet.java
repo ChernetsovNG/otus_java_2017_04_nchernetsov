@@ -1,5 +1,8 @@
 package ru.otus.servlet;
 
+import ru.otus.base.dataSets.AddressDataSet;
+import ru.otus.base.dataSets.PhoneDataSet;
+import ru.otus.base.dataSets.UserDataSet;
 import ru.otus.service.CacheInfoService;
 import ru.otus.service.DBService;
 
@@ -8,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import static ru.otus.servlet.AppContextLoader.applicationContext;
@@ -25,6 +29,14 @@ public class CacheInfoServlet extends HttpServlet {
     public void init(){
         this.dbService = (DBService) applicationContext.getBean("dbService");
         this.cacheInfoService = (CacheInfoService) applicationContext.getBean("cacheInfoService");
+
+        // for test purposes only
+        for (int i = 1; i <= 6; i++) {
+            UserDataSet userDataSet = new UserDataSet("User " + i,
+                new AddressDataSet("Street " + i, i),
+                Collections.singletonList(new PhoneDataSet(i, String.valueOf(i))));
+            dbService.save(userDataSet);
+        }
     }
 
     @Override

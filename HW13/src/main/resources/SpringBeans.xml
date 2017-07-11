@@ -5,7 +5,7 @@
 
     <bean id="cacheEngine" class="ru.otus.cache.CacheEngineImpl">
         <constructor-arg name="maxElements" value="5"/>
-        <constructor-arg name="lifeTimeMs" value="15000"/>
+        <constructor-arg name="lifeTimeMs" value="10000"/>
         <constructor-arg name="idleTimeMs" value="0"/>
         <constructor-arg name="isEternal" value="false"/>
     </bean>

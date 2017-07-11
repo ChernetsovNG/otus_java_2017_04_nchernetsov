@@ -10,7 +10,6 @@ import ru.otus.base.dataSets.AddressDataSet;
 import ru.otus.base.dataSets.PhoneDataSet;
 import ru.otus.base.dataSets.UserDataSet;
 import ru.otus.cache.CacheEngine;
-import ru.otus.cache.CacheEngineImpl;
 import ru.otus.cache.Element;
 import ru.otus.service.dao.UserDataSetDAO;
 
@@ -21,13 +20,9 @@ import java.util.stream.Collectors;
 
 public class DBServiceHibernateImpl implements DBService {
     private final SessionFactory sessionFactory;
-    private final CacheEngine<Long, UserDataSet> cache;
+    private final CacheEngine<Long, UserDataSet> cacheEngine;
 
-    private static final int MAX_ELEMENTS = 5;
-    private static final int LIFE_TIME_MS = 5_000;
-    private static final int IDLE_TIME_MS = 0;
-
-    public DBServiceHibernateImpl() {
+    public DBServiceHibernateImpl(CacheEngine cacheEngine) {
         Configuration configuration = new Configuration();
 
         configuration.addAnnotatedClass(UserDataSet.class);
@@ -46,10 +41,7 @@ public class DBServiceHibernateImpl implements DBService {
 
         sessionFactory = createSessionFactory(configuration);
 
-        // Создаём кеш
-        cache = new CacheEngineImpl<>(MAX_ELEMENTS, LIFE_TIME_MS, IDLE_TIME_MS, false);
-
-
+        this.cacheEngine = cacheEngine;
     }
 
     public String getLocalStatus() {
@@ -60,13 +52,13 @@ public class DBServiceHibernateImpl implements DBService {
         try (Session session = sessionFactory.openSession()) {
             UserDataSetDAO dao = new UserDataSetDAO(session);
             dao.save(dataSet);
-            cache.put(new Element<>(dataSet.getId(), dataSet));  // добавляем элемент в кеш
+            cacheEngine.put(new Element<>(dataSet.getId(), dataSet));  // добавляем элемент в кеш
         }
     }
 
     public UserDataSet read(long id) {
         // сперва ищем в кеше, если там нет, то обращаемся к базе
-        Element<Long, UserDataSet> element = cache.get(id);
+        Element<Long, UserDataSet> element = cacheEngine.get(id);
 
         UserDataSet userFromCache;
         if (element != null) {
@@ -87,7 +79,7 @@ public class DBServiceHibernateImpl implements DBService {
 
     public UserDataSet readByName(String name) {
         // просматриваем все элементы в кеше в поисках нужного
-        List<Element<Long, UserDataSet>> elementsFromCache = cache.getAll();
+        List<Element<Long, UserDataSet>> elementsFromCache = cacheEngine.getAll();
         for (Element<Long, UserDataSet> element : elementsFromCache) {
             UserDataSet userFromCache = element.getValue();
             if (userFromCache.getName().equals(name)) {
@@ -102,7 +94,7 @@ public class DBServiceHibernateImpl implements DBService {
     }
 
     public List<UserDataSet> readAllFromCache() {
-        List<Element<Long, UserDataSet>> elementsFromCache = cache.getAll();
+        List<Element<Long, UserDataSet>> elementsFromCache = cacheEngine.getAll();
         return elementsFromCache.stream().map(Element::getValue).collect(Collectors.toList());
     }
 
@@ -117,7 +109,7 @@ public class DBServiceHibernateImpl implements DBService {
         runInSession(session -> {
             UserDataSetDAO dao = new UserDataSetDAO(session);
             // Удаляем запись из кеша
-            cache.removeElement(id);
+            cacheEngine.removeElement(id);
             // Удаляем из базы
             dao.deleteUserById(id);
             return null;
@@ -148,9 +140,9 @@ public class DBServiceHibernateImpl implements DBService {
     public int[] getCacheStats() {
         int[] res = new int[3];
 
-        res[0] = cache.getHitCount();
-        res[1] = cache.getMissCount();
-        res[2] = cache.getElementsCount();
+        res[0] = cacheEngine.getHitCount();
+        res[1] = cacheEngine.getMissCount();
+        res[2] = cacheEngine.getElementsCount();
 
         return res;
     }

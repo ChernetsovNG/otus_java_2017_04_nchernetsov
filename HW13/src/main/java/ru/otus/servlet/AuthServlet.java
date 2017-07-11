@@ -1,5 +1,9 @@
 package ru.otus.servlet;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -9,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AuthServlet extends HttpServlet {
-    public static final String LOGIN_PARAMETER_NAME = "login";
+    static final String LOGIN_PARAMETER_NAME = "login";
     private static final String LOGIN_VARIABLE_NAME = "login";
-    public static final String PASSWORD_PARAMETER_NAME = "password";
+    static final String PASSWORD_PARAMETER_NAME = "password";
     private static final String PASSWORD_VARIABLE_NAME = "password";
 
     private static final String AUTHORIZATION_PAGE_TEMPLATE = "auth.html";
@@ -19,9 +23,7 @@ public class AuthServlet extends HttpServlet {
     private String login;
     private String password;
 
-    public AuthServlet(String login, String password) {
-        this.login = login;
-        this.password = password;
+    public void init() {
     }
 
     public void doGet(HttpServletRequest request,

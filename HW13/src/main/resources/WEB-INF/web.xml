@@ -5,6 +5,15 @@
     <display-name>Otus-2017-04-HW13</display-name>
     <description>War file</description>
 
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:SpringBeans.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>cacheInfoServlet</servlet-name>
         <servlet-class>ru.otus.servlet.CacheInfoServlet</servlet-class>

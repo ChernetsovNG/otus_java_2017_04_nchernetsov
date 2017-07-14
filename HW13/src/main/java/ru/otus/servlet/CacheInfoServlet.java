@@ -1,11 +1,14 @@
 package ru.otus.servlet;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import ru.otus.base.dataSets.AddressDataSet;
 import ru.otus.base.dataSets.PhoneDataSet;
 import ru.otus.base.dataSets.UserDataSet;
 import ru.otus.service.CacheInfoService;
 import ru.otus.service.DBService;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
-
-import static ru.otus.servlet.AppContextLoader.applicationContext;
 
 public class CacheInfoServlet extends HttpServlet {
     private static final String ACCESS_DENIED_PAGE_TEMPLATE = "access_denied.html";
@@ -26,9 +27,10 @@ public class CacheInfoServlet extends HttpServlet {
     private DBService dbService;
     private CacheInfoService cacheInfoService;
 
-    public void init(){
-        this.dbService = (DBService) applicationContext.getBean("dbService");
-        this.cacheInfoService = (CacheInfoService) applicationContext.getBean("cacheInfoService");
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
+        initBeansFromServletContext(config);
 
         // for test purposes only
         for (int i = 1; i <= 6; i++) {
@@ -37,6 +39,13 @@ public class CacheInfoServlet extends HttpServlet {
                 Collections.singletonList(new PhoneDataSet(i, String.valueOf(i))));
             dbService.save(userDataSet);
         }
+    }
+
+    private void initBeansFromServletContext(ServletConfig config) {
+        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
+
+        this.dbService = (DBService) context.getBean("dbService");
+        this.cacheInfoService = (CacheInfoService) context.getBean("cacheInfoService");
     }
 
     @Override

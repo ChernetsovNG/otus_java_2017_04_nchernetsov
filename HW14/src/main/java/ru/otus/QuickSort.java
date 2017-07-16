@@ -1,19 +1,19 @@
 package ru.otus;
 
-public class QuickSort {
-    public int nElems;
-    public long[] theArray;  // сортируемый массив
+class QuickSort {
+    private int nElems;
+    private long[] theArray;  // сортируемый массив
 
-    public QuickSort(long[] theArray) {
+    QuickSort(long[] theArray) {
         nElems = theArray.length;
         this.theArray = theArray;
     }
 
-    public void sort() {
+    void sort() {
         recQuickSort(0, nElems - 1);
     }
 
-    public void recQuickSort(int left, int right) {
+    private void recQuickSort(int left, int right) {
         int size = right - left + 1;
 
         if (size <= 3)  {
@@ -51,7 +51,7 @@ public class QuickSort {
 
     // метод разбиения массива на два подмассива со значениями, большими и меньшими опорного элемента
     // возвращает крайний левый элемент правого (большего) подмассива
-    public int partitionIt(int left, int right, long pivot) {
+    private int partitionIt(int left, int right, long pivot) {
         int leftPtr = left;        // справа от первого элемента
         int rightPrt = right - 1;  // слева от опорного элемента
 

@@ -1,14 +1,14 @@
 package ru.otus;
 
-class QuickSort {
-    private int nElems;
-    private long[] theArray;  // сортируемый массив
+// последовательная быстрая сортировка
+class QuickSort extends ArraySort {
 
     QuickSort(long[] theArray) {
         nElems = theArray.length;
         this.theArray = theArray;
     }
 
+    @Override
     void sort() {
         recQuickSort(0, nElems - 1);
     }
@@ -96,14 +96,6 @@ class QuickSort {
                 swap(right - 1, right);  // center, right
             }
         }
-
-
     }
 
-    // перестановка двух элементов
-    private void swap(int dex1, int dex2) {
-        long temp = theArray[dex1];
-        theArray[dex1] = theArray[dex2];
-        theArray[dex2] = temp;
-    }
 }

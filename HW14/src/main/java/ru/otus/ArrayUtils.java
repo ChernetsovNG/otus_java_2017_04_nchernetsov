@@ -37,11 +37,11 @@ class ArrayUtils {
         return true;
     }
 
-    static long[] createRandomArray(int size) {
+    static long[] createRandomArray(int size, long limit) {
         long[] array = new long[size];
 
         for (int i = 0; i < size; i++) {
-            long n = (int) (Math.random() * 99);
+            long n = (int) (Math.random() * limit);
             array[i] = n;
         }
 

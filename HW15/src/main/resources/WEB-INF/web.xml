@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<web-app>
+
+    <display-name>Otus-2017-04-HW15</display-name>
+    <description>War file</description>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:SpringBeans.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>cacheInfoServlet</servlet-name>
+        <servlet-class>ru.otus.servlet.CacheInfoServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>authServlet</servlet-name>
+        <servlet-class>ru.otus.servlet.AuthServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>cacheInfoServlet</servlet-name>
+        <url-pattern>/cache_info</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>authServlet</servlet-name>
+        <url-pattern>/auth</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+</web-app>

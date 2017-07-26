@@ -3,7 +3,7 @@ package ru.otus.messageSystem;
 public class MessageSystemContext {
     private final MessageSystem messageSystem;
 
-    private Address frontAddress;
+    private Address cacheInfoServiceAddress;
     private Address dbAddress;
 
     public MessageSystemContext(MessageSystem messageSystem) {
@@ -14,12 +14,12 @@ public class MessageSystemContext {
         return messageSystem;
     }
 
-    public Address getFrontAddress() {
-        return frontAddress;
+    public Address getCacheInfoServiceAddress() {
+        return cacheInfoServiceAddress;
     }
 
-    public void setFrontAddress(Address frontAddress) {
-        this.frontAddress = frontAddress;
+    public void setCacheInfoServiceAddress(Address cacheInfoServiceAddress) {
+        this.cacheInfoServiceAddress = cacheInfoServiceAddress;
     }
 
     public Address getDbAddress() {

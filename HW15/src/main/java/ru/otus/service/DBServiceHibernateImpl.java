@@ -11,6 +11,9 @@ import ru.otus.base.dataSets.PhoneDataSet;
 import ru.otus.base.dataSets.UserDataSet;
 import ru.otus.cache.CacheEngine;
 import ru.otus.cache.Element;
+import ru.otus.messageSystem.Address;
+import ru.otus.messageSystem.Addressee;
+import ru.otus.messageSystem.MessageSystemContext;
 import ru.otus.service.dao.UserDataSetDAO;
 
 import java.util.List;
@@ -18,11 +21,13 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public class DBServiceHibernateImpl implements DBService {
+public class DBServiceHibernateImpl implements DBService, Addressee {
+    private final Address address;
+    private final MessageSystemContext context;
     private final SessionFactory sessionFactory;
     private final CacheEngine<Long, UserDataSet> cacheEngine;
 
-    public DBServiceHibernateImpl(CacheEngine cacheEngine) {
+    public DBServiceHibernateImpl(CacheEngine cacheEngine, MessageSystemContext context, Address address) {
         Configuration configuration = new Configuration();
 
         configuration.addAnnotatedClass(UserDataSet.class);
@@ -42,6 +47,10 @@ public class DBServiceHibernateImpl implements DBService {
         sessionFactory = createSessionFactory(configuration);
 
         this.cacheEngine = cacheEngine;
+        this.context = context;
+        this.address = address;
+
+        this.context.getMessageSystem().addAddressee(this);
     }
 
     public String getLocalStatus() {
@@ -149,5 +158,10 @@ public class DBServiceHibernateImpl implements DBService {
         res[2] = cacheEngine.getElementsCount();
 
         return res;
+    }
+
+    @Override
+    public Address getAddress() {
+        return address;
     }
 }

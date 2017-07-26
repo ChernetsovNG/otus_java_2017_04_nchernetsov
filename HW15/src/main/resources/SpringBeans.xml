@@ -10,13 +10,34 @@
         <constructor-arg name="isEternal" value="false"/>
     </bean>
 
-    <bean id="dbService" class="ru.otus.service.DBServiceHibernateImpl">
-        <constructor-arg name="cacheEngine" ref="cacheEngine"/>
+    <bean id="messageSystem" class="ru.otus.messageSystem.MessageSystem">
     </bean>
 
-    <bean id="cacheInfoService" class="ru.otus.service.CacheInfoService">
+    <bean id="cacheInfoServiceAddress" class="ru.otus.messageSystem.Address">
+        <constructor-arg name="id" value="CacheInfoService"/>
+    </bean>
+
+    <bean id="dbAddress" class="ru.otus.messageSystem.Address">
+        <constructor-arg name="id" value="DB"/>
+    </bean>
+
+    <bean id="messageSystemContext" class="ru.otus.messageSystem.MessageSystemContext">
+        <constructor-arg name="messageSystem" ref="messageSystem"/>
+        <property name="cacheInfoServiceAddress" ref="cacheInfoServiceAddress"/>
+        <property name="dbAddress" ref="dbAddress"/>
+    </bean>
+
+    <bean id="dbService" class="ru.otus.service.DBServiceHibernateImpl">
+        <constructor-arg name="cacheEngine" ref="cacheEngine"/>
+        <constructor-arg name="context" ref="messageSystemContext"/>
+        <constructor-arg name="address" ref="dbAddress"/>
+    </bean>
+
+    <bean id="cacheInfoService" class="ru.otus.service.CacheInfoService" init-method="messageSystemStart">
         <constructor-arg name="pattern" value="HH-mm-ss" />
         <constructor-arg name="dbService" ref="dbService" />
+        <constructor-arg name="context" ref="messageSystemContext"/>
+        <constructor-arg name="address" ref="cacheInfoServiceAddress"/>
     </bean>
 
     <bean id="cacheInfoServlet" class="ru.otus.servlet.CacheInfoServlet">

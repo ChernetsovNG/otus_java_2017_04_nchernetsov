@@ -1,8 +1,8 @@
-package ru.otus.service.dao;
+package ru.otus.service.db.dao;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import ru.otus.base.dataSets.UserDataSet;
+import ru.otus.dataSets.UserDataSet;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;

@@ -2,11 +2,11 @@ package ru.otus.servlet;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import ru.otus.base.dataSets.AddressDataSet;
-import ru.otus.base.dataSets.PhoneDataSet;
-import ru.otus.base.dataSets.UserDataSet;
-import ru.otus.service.CacheInfoService;
-import ru.otus.service.DBService;
+import ru.otus.dataSets.AddressDataSet;
+import ru.otus.dataSets.PhoneDataSet;
+import ru.otus.dataSets.UserDataSet;
+import ru.otus.service.cache.CacheInfoServiceImpl;
+import ru.otus.app.DBService;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -25,7 +25,7 @@ public class CacheInfoServlet extends HttpServlet {
     private static final String HARDCODED_PASSWORD = "12345";
 
     private DBService dbService;
-    private CacheInfoService cacheInfoService;
+    private CacheInfoServiceImpl cacheInfoService;
 
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -45,7 +45,7 @@ public class CacheInfoServlet extends HttpServlet {
         ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
 
         this.dbService = (DBService) context.getBean("dbService");
-        this.cacheInfoService = (CacheInfoService) context.getBean("cacheInfoService");
+        this.cacheInfoService = (CacheInfoServiceImpl) context.getBean("cacheInfoService");
     }
 
     @Override

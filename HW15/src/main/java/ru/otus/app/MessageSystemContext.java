@@ -1,4 +1,7 @@
-package ru.otus.messageSystem;
+package ru.otus.app;
+
+import ru.otus.messageSystem.Address;
+import ru.otus.messageSystem.MessageSystem;
 
 public class MessageSystemContext {
     private final MessageSystem messageSystem;

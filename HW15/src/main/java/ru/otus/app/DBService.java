@@ -1,6 +1,6 @@
-package ru.otus.service;
+package ru.otus.app;
 
-import ru.otus.base.dataSets.UserDataSet;
+import ru.otus.dataSets.UserDataSet;
 
 import java.util.List;
 

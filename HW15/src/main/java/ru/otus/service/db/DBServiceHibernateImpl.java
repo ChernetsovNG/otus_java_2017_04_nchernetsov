@@ -1,4 +1,4 @@
-package ru.otus.service;
+package ru.otus.service.db;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -6,15 +6,16 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
-import ru.otus.base.dataSets.AddressDataSet;
-import ru.otus.base.dataSets.PhoneDataSet;
-import ru.otus.base.dataSets.UserDataSet;
-import ru.otus.cache.CacheEngine;
-import ru.otus.cache.Element;
+import ru.otus.app.DBService;
+import ru.otus.dataSets.AddressDataSet;
+import ru.otus.dataSets.PhoneDataSet;
+import ru.otus.dataSets.UserDataSet;
+import ru.otus.service.cache.CacheEngine;
+import ru.otus.service.cache.Element;
 import ru.otus.messageSystem.Address;
 import ru.otus.messageSystem.Addressee;
-import ru.otus.messageSystem.MessageSystemContext;
-import ru.otus.service.dao.UserDataSetDAO;
+import ru.otus.app.MessageSystemContext;
+import ru.otus.service.db.dao.UserDataSetDAO;
 
 import java.util.List;
 import java.util.function.Function;
@@ -49,7 +50,9 @@ public class DBServiceHibernateImpl implements DBService, Addressee {
         this.cacheEngine = cacheEngine;
         this.context = context;
         this.address = address;
+    }
 
+    public void init() {
         this.context.getMessageSystem().addAddressee(this);
     }
 

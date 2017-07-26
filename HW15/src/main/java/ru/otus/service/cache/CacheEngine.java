@@ -1,4 +1,4 @@
-package ru.otus.cache;
+package ru.otus.service.cache;
 
 import java.util.List;
 

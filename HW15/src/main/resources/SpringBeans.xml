@@ -3,7 +3,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean id="cacheEngine" class="ru.otus.cache.CacheEngineImpl">
+    <bean id="cacheEngine" class="ru.otus.service.cache.CacheEngineImpl">
         <constructor-arg name="maxElements" value="5"/>
         <constructor-arg name="lifeTimeMs" value="10000"/>
         <constructor-arg name="idleTimeMs" value="0"/>
@@ -21,19 +21,19 @@
         <constructor-arg name="id" value="DB"/>
     </bean>
 
-    <bean id="messageSystemContext" class="ru.otus.messageSystem.MessageSystemContext">
+    <bean id="messageSystemContext" class="ru.otus.app.MessageSystemContext">
         <constructor-arg name="messageSystem" ref="messageSystem"/>
         <property name="cacheInfoServiceAddress" ref="cacheInfoServiceAddress"/>
         <property name="dbAddress" ref="dbAddress"/>
     </bean>
 
-    <bean id="dbService" class="ru.otus.service.DBServiceHibernateImpl">
+    <bean id="dbService" class="ru.otus.service.db.DBServiceHibernateImpl" init-method="init">
         <constructor-arg name="cacheEngine" ref="cacheEngine"/>
         <constructor-arg name="context" ref="messageSystemContext"/>
         <constructor-arg name="address" ref="dbAddress"/>
     </bean>
 
-    <bean id="cacheInfoService" class="ru.otus.service.CacheInfoService" init-method="messageSystemStart">
+    <bean id="cacheInfoService" class="ru.otus.service.cache.CacheInfoServiceImpl" init-method="init">
         <constructor-arg name="pattern" value="HH-mm-ss" />
         <constructor-arg name="dbService" ref="dbService" />
         <constructor-arg name="context" ref="messageSystemContext"/>

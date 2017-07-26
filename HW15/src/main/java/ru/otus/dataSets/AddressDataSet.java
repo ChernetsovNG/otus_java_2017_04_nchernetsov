@@ -1,4 +1,4 @@
-package ru.otus.base.dataSets;
+package ru.otus.dataSets;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,15 +1,18 @@
-package ru.otus.service;
+package ru.otus.service.cache;
 
+import ru.otus.app.CacheInfoService;
+import ru.otus.app.DBService;
+import ru.otus.app.MessageSystemContext;
 import ru.otus.messageSystem.*;
-import ru.otus.messageSystem.message.MsgGetCacheInfo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-public class CacheInfoService implements Addressee {
+public class CacheInfoServiceImpl implements CacheInfoService, Addressee {
     private final Address address;
     private final MessageSystemContext context;
 
@@ -19,19 +22,24 @@ public class CacheInfoService implements Addressee {
 
     private final DBService dbService;
 
+    private final int answerWaitTimeMs = 10;
     private int[] cacheStats = new int[3];
     private volatile boolean isCacheStatsWasWritten = false;
 
-    public CacheInfoService(MessageSystemContext context, DBService dbService, Address address) {
+    public CacheInfoServiceImpl(MessageSystemContext context, DBService dbService, Address address) {
         this.dbService = dbService;
         this.context = context;
         this.address = address;
         this.pattern = DEFAULT_PATTERN;
-
-        this.context.getMessageSystem().addAddressee(this);
     }
 
-    public CacheInfoService(MessageSystemContext context, Address address, DBService dbService, String pattern) {
+    public void init() {
+        this.context.getMessageSystem().addAddressee(this);
+        // запускаем систему обработки сообщений
+        context.getMessageSystem().start();
+    }
+
+    public CacheInfoServiceImpl(MessageSystemContext context, Address address, DBService dbService, String pattern) {
         this.context = context;
         this.address = address;
         this.dbService = dbService;
@@ -46,10 +54,10 @@ public class CacheInfoService implements Addressee {
         Message message = new MsgGetCacheInfo(context.getMessageSystem(), getAddress(), context.getDbAddress());
         context.getMessageSystem().sendMessage(message);
 
-        // Здесь надо приостановить поток, пока не придёт ответ от системы сообщений!
+        // Приостанавливаем поток до тех пор, пока не придёт ответ от системы сообщений
         while (!isCacheStatsWasWritten) {
             try {
-                Thread.sleep(10);
+                TimeUnit.MILLISECONDS.sleep(answerWaitTimeMs);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -71,6 +79,7 @@ public class CacheInfoService implements Addressee {
         return formatter.format(date);
     }
 
+    @Override
     public void putCacheStats(int[] cacheStats) {
         this.cacheStats = cacheStats;
         isCacheStatsWasWritten = true;
@@ -79,9 +88,5 @@ public class CacheInfoService implements Addressee {
     @Override
     public Address getAddress() {
         return address;
-    }
-
-    public void messageSystemStart() {
-        context.getMessageSystem().start();
     }
 }

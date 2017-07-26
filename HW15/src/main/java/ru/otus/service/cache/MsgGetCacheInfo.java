@@ -1,13 +1,14 @@
-package ru.otus.messageSystem.message;
+package ru.otus.service.cache;
 
+import ru.otus.app.DBService;
+import ru.otus.app.MsgToDB;
 import ru.otus.messageSystem.Address;
 import ru.otus.messageSystem.MessageSystem;
-import ru.otus.service.DBService;
 
 public class MsgGetCacheInfo extends MsgToDB {
     private final MessageSystem messageSystem;
 
-    public MsgGetCacheInfo(MessageSystem messageSystem, Address from, Address to) {
+    MsgGetCacheInfo(MessageSystem messageSystem, Address from, Address to) {
         super(from, to);
         this.messageSystem = messageSystem;
     }

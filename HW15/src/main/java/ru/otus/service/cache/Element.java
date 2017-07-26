@@ -1,4 +1,4 @@
-package ru.otus.cache;
+package ru.otus.service.cache;
 
 public class Element<K, V> {
     private final K key;

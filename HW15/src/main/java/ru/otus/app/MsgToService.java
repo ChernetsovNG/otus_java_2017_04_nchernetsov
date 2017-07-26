@@ -1,9 +1,8 @@
-package ru.otus.messageSystem.message;
+package ru.otus.app;
 
 import ru.otus.messageSystem.Address;
 import ru.otus.messageSystem.Addressee;
 import ru.otus.messageSystem.Message;
-import ru.otus.service.CacheInfoService;
 
 public abstract class MsgToService extends Message {
     public MsgToService(Address from, Address to) {

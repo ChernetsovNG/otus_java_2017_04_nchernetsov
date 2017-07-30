@@ -6,7 +6,6 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
-import ru.otus.DBService;
 import ru.otus.cache.CacheEngine;
 import ru.otus.cache.CacheEngineImpl;
 import ru.otus.cache.Element;

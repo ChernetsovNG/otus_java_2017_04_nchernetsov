@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.frontend;
 
 import ru.otus.db.MsgGetUserId;
 import ru.otus.messageSystem.MessageSystemContext;

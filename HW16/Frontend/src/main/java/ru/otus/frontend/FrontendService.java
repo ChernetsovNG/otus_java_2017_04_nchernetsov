@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.frontend;
 
 public interface FrontendService {
     void init();

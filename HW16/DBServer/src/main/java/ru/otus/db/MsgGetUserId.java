@@ -1,7 +1,6 @@
 package ru.otus.db;
 
-import ru.otus.DBService;
-import ru.otus.MsgGetUserIdAnswer;
+import ru.otus.frontend.MsgGetUserIdAnswer;
 import ru.otus.messageSystem.Address;
 import ru.otus.messageSystem.MessageSystem;
 

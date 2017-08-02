@@ -1,7 +1,7 @@
 package ru.otus;
 
 import ru.otus.runner.ProcessRunnerImpl;
-import ru.otus.server.MirrorServer;
+import ru.otus.server.MessageServer;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -35,7 +35,7 @@ public class MessageServerMain {
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = new ObjectName("ru.otus:type=Server");
-        MirrorServer server = new MirrorServer();
+        MessageServer server = new MessageServer();
         mbs.registerMBean(server, name);
 
         server.start();

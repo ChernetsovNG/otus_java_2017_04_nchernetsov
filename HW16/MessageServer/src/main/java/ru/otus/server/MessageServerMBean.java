@@ -1,6 +1,6 @@
 package ru.otus.server;
 
-public interface MirrorServerMBean {
+public interface MessageServerMBean {
     boolean getRunning();
 
     void setRunning(boolean running);

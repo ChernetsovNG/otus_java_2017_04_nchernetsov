@@ -7,6 +7,7 @@
     <groupId>ru.otus.nchernetsov</groupId>
     <artifactId>Frontend</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,7 +49,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>ru.otus.nchernetsov.Main</mainClass>
+                            <mainClass>ru.otus.Frontend</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

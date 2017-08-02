@@ -1,15 +1,13 @@
-package ru.otus;
-
-import ru.otus.channel.SocketClientChannel;
+package ru.otus.channel;
 
 import java.io.IOException;
 import java.net.Socket;
 
-class SocketClientManagedChanel extends SocketClientChannel {
+public class SocketClientManagedChanel extends SocketClientChannel {
 
     private final Socket socket;
 
-    SocketClientManagedChanel(String host, int port) throws IOException {
+    public SocketClientManagedChanel(String host, int port) throws IOException {
         this(new Socket(host, port));
     }
 

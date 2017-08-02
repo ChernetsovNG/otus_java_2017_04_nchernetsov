@@ -3,28 +3,29 @@ package ru.otus.service.cache;
 import ru.otus.app.CacheInfoService;
 import ru.otus.app.DBService;
 import ru.otus.app.MessageSystemContext;
-import ru.otus.messageSystem.*;
+import ru.otus.messageSystem.Address;
+import ru.otus.messageSystem.Addressee;
+import ru.otus.messageSystem.Message;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class CacheInfoServiceImpl implements CacheInfoService, Addressee {
     private final Address address;
     private final MessageSystemContext context;
+
+    private final BlockingQueue<int[]> cacheStatsQueue = new LinkedBlockingQueue<>();  // Блокирующая очередь, в которой будем хранить статистику кеша
 
     private static final String DEFAULT_PATTERN = "HH.mm.ss";
 
     private final String pattern;
 
     private final DBService dbService;
-
-    private final int answerWaitTimeMs = 10;
-    private int[] cacheStats = new int[3];
-    private volatile boolean isCacheStatsWasWritten = false;
 
     public CacheInfoServiceImpl(MessageSystemContext context, DBService dbService, Address address) {
         this.dbService = dbService;
@@ -54,20 +55,18 @@ public class CacheInfoServiceImpl implements CacheInfoService, Addressee {
         Message message = new MsgGetCacheInfo(context.getMessageSystem(), getAddress(), context.getDbAddress());
         context.getMessageSystem().sendMessage(message);
 
-        // Приостанавливаем поток до тех пор, пока не придёт ответ от системы сообщений
-        while (!isCacheStatsWasWritten) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(answerWaitTimeMs);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        // Достаём из блокирующей очереди ответ от системы сообщений
+        int[] cacheStats = new int[3];
+
+        try {
+            cacheStats = cacheStatsQueue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         pageVariables.put("hit_count", cacheStats[0]);
         pageVariables.put("miss_count", cacheStats[1]);
         pageVariables.put("element_count", cacheStats[2]);
-
-        isCacheStatsWasWritten = false;
 
         return pageVariables;
     }
@@ -81,8 +80,11 @@ public class CacheInfoServiceImpl implements CacheInfoService, Addressee {
 
     @Override
     public void putCacheStats(int[] cacheStats) {
-        this.cacheStats = cacheStats;
-        isCacheStatsWasWritten = true;
+        try {
+            cacheStatsQueue.put(cacheStats);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

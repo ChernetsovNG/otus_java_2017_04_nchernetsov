@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import ru.otus.app.Msg;
-import ru.otus.app.MsgChannel;
+import ru.otus.app.Message;
+import ru.otus.app.MessageChannel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,12 +19,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SocketClientChannel implements MsgChannel {
+public class SocketClientChannel implements MessageChannel {
     private static final Logger logger = Logger.getLogger(SocketClientChannel.class.getName());
     private static final int WORKERS_COUNT = 2;
 
-    private final BlockingQueue<Msg> output = new LinkedBlockingQueue<>();
-    private final BlockingQueue<Msg> input = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Message> output = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Message> input = new LinkedBlockingQueue<>();
 
     private final ExecutorService executor;
 
@@ -49,7 +49,7 @@ public class SocketClientChannel implements MsgChannel {
                 stringBuilder.append(inputLine);
                 if (inputLine.isEmpty() && !stringBuilder.toString().isEmpty()) {
                     String json = stringBuilder.toString();
-                    Msg msg = getMsgFromJSON(json);
+                    Message msg = getMsgFromJSON(json);
                     input.add(msg);
                     stringBuilder = new StringBuilder();
                 }
@@ -61,19 +61,19 @@ public class SocketClientChannel implements MsgChannel {
         }
     }
 
-    private Msg getMsgFromJSON(String json) throws ParseException, ClassNotFoundException {
+    private Message getMsgFromJSON(String json) throws ParseException, ClassNotFoundException {
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(json);
-        String className = (String) jsonObject.get(Msg.CLASS_NAME_VARIABLE);
+        String className = (String) jsonObject.get(Message.CLASS_NAME_VARIABLE);
         Class<?> msgClass = Class.forName(className);
-        return (Msg) new Gson().fromJson(json, msgClass);
+        return (Message) new Gson().fromJson(json, msgClass);
     }
 
     private void sendMessage() {
         try (PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
             while (client.isConnected()) {
-                Msg msg = output.take();  // blocks here
-                String json = new Gson().toJson(msg);
+                Message message = output.take();  // blocks here
+                String json = new Gson().toJson(message);
                 out.println(json);
                 out.println("\n");
             }
@@ -83,17 +83,17 @@ public class SocketClientChannel implements MsgChannel {
     }
 
     @Override
-    public void send(Msg msg) {
-        output.add(msg);
+    public void send(Message message) {
+        output.add(message);
     }
 
     @Override
-    public Msg pool() {
+    public Message poll() {
         return input.poll();
     }
 
     @Override
-    public Msg take() throws InterruptedException {
+    public Message take() throws InterruptedException {
         return input.take();
     }
 

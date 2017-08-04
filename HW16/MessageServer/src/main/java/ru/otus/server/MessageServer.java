@@ -1,7 +1,7 @@
 package ru.otus.server;
 
-import ru.otus.app.Msg;
-import ru.otus.app.MsgChannel;
+import ru.otus.app.Message;
+import ru.otus.app.MessageChannel;
 import ru.otus.channel.SocketClientChannel;
 
 import java.net.ServerSocket;
@@ -12,17 +12,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-public class MirrorServer implements MirrorServerMBean {
-    private static final Logger logger = Logger.getLogger(MirrorServer.class.getName());
+public class MessageServer implements MessageServerMBean {
+    private static final Logger logger = Logger.getLogger(MessageServer.class.getName());
 
-    private static final int THREADS_NUMBER = 1;
-    private static final int PORT = 5050;
+    private static final int THREADS_NUMBER = 2;
+    private static final int PORT1 = 5050;
+    //private static final int PORT2 = 5051;
     private static final int MIRROR_DELAY = 100;
 
     private final ExecutorService executor;
-    private final List<MsgChannel> channels;
+    private final List<MessageChannel> channels;
 
-    public MirrorServer() {
+    public MessageServer() {
         executor = Executors.newFixedThreadPool(THREADS_NUMBER);
         channels = new ArrayList<>();
     }
@@ -30,10 +31,10 @@ public class MirrorServer implements MirrorServerMBean {
     public void start() throws Exception {
         executor.submit(this::mirror);
 
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT1)) {
             logger.info("Server started on port: " + serverSocket.getLocalPort());
             while (!executor.isShutdown()) {
-                Socket client = serverSocket.accept(); //blocks
+                Socket client = serverSocket.accept();  // blocks
                 SocketClientChannel channel = new SocketClientChannel(client);
                 channel.init();
                 channels.add(channel);
@@ -41,14 +42,13 @@ public class MirrorServer implements MirrorServerMBean {
         }
     }
 
-    @SuppressWarnings("InfiniteLoopStatement")
     private Object mirror() throws InterruptedException {
         while (true) {
-            for (MsgChannel channel : channels) {
-                Msg msg = channel.pool();
-                if (msg != null) {
-                    System.out.println("Mirroring the message: " + msg.toString());
-                    channel.send(msg);
+            for (MessageChannel channel : channels) {
+                Message message = channel.poll();
+                if (message != null) {
+                    System.out.println("Mirroring the message: " + message.toString());
+                    channel.send(message);
                 }
             }
             Thread.sleep(MIRROR_DELAY);

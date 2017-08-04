@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// Запускает отдельный процесс (JVM)
 public class ProcessRunnerImpl implements ProcessRunner {
     private final StringBuffer out = new StringBuffer();
     private Process process;
@@ -30,11 +31,11 @@ public class ProcessRunnerImpl implements ProcessRunner {
         pb.redirectErrorStream(true);
         Process p = pb.start();
 
-        StreamListener errors = new StreamListener(p.getErrorStream(), "ERROR");
-        StreamListener output = new StreamListener(p.getInputStream(), "OUTPUT");
+        //StreamListener errors = new StreamListener(p.getErrorStream(), "ERROR");
+        //StreamListener output = new StreamListener(p.getInputStream(), "OUTPUT");
 
-        output.start();
-        errors.start();
+        //output.start();
+        //errors.start();
         return p;
     }
 

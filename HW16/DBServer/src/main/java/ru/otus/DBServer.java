@@ -9,8 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Main {
-    private static final Logger logger = Logger.getLogger(Main.class.getName());
+public class DBServer {
+    private static final Logger logger = Logger.getLogger(DBServer.class.getName());
 
     private static final String HOST = "localhost";
     private static final int PORT = 5052;
@@ -19,7 +19,7 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        new Main().start();
+        new DBServer().start();
     }
 
     @SuppressWarnings("InfiniteLoopStatement")

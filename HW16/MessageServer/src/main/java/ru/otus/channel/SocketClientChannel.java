@@ -44,7 +44,7 @@ public class SocketClientChannel implements MsgChannel {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
             String inputLine;
             StringBuilder stringBuilder = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
+            while ((inputLine = in.readLine()) != null) {  // blocks here
                 //System.out.println("Message received: " + inputLine);
                 stringBuilder.append(inputLine);
                 if (inputLine.isEmpty() && !stringBuilder.toString().isEmpty()) {
@@ -72,7 +72,7 @@ public class SocketClientChannel implements MsgChannel {
     private void sendMessage() {
         try (PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
             while (client.isConnected()) {
-                Msg msg = output.take();
+                Msg msg = output.take();  // blocks here
                 String json = new Gson().toJson(msg);
                 out.println(json);
                 out.println("\n");

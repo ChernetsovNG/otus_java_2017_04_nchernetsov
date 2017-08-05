@@ -77,76 +77,66 @@ public class MessageServer implements MessageServerMBean, Addressee {
         }
     }
 
-    // Основная процедура обработки сообщений. Получает сообщение и пересылает его по нужному адресу
-    private void messageHandle() {
-        // Ждём, пока не будет инициализирована карта адресов
-        while (!isConnectionMapInitialized) {
-            try {
-                Thread.sleep(MESSAGE_DELAY);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        // Запускаем процедуру обработки сообщений
-        while (true) {
-            for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
-                MessageChannel channel = entry.getKey();
-
-                Message message = channel.poll();
-                if (message != null) {
-                    logger.info("MessageServer receive the message from: " + message.getFrom() + ". Receive it to: " + message.getTo() + ". " + message);
-                    getChannelByAddress(message.getTo()).send(message);
-                }
-            }
-            try {
-                Thread.sleep(MESSAGE_DELAY);
-            } catch (InterruptedException e) {
-                logger.log(Level.SEVERE, e.toString());
-            }
-        }
-    }
-
     // Принимаем идентифицирующие сообщение, и сохраняем в карте соответствие адресата и его канала
     private void handshake() {
-        // Ждём, пока подключатся все клиенты
-        while (connectionMap.size() < CLIENTS_NUMBER) {
-            try {
+        try {
+            // Ждём, пока подключатся все клиенты
+            while (connectionMap.size() < CLIENTS_NUMBER) {
                 Thread.sleep(MESSAGE_DELAY);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
-        }
-
-        // до тех пор, пока все адреса связанных каналов не будут успешно определены, продолжаем этот цикл
-        while (true) {
             // После этого сохраняем адреса подключённых клиентов
-            for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
-                MessageChannel channel = entry.getKey();
-                Address address = entry.getValue();
+            while (true) {
+                for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
+                    MessageChannel channel = entry.getKey();
+                    Address address = entry.getValue();
 
-                if (address == null) {
-                    Message message = channel.poll();
-                    if (message != null) {
-                        if (message.getClassName().equals(HandshakeDemandMessage.class.getName())) {
-                            Address from = message.getFrom();
-                            logger.info("Получен запрос на установление соединения от: " + from + ", " + message);
-                            connectionMap.put(channel, from);
-                            Message handshakeAnswerMessage = new HandshakeAnswerMessage(this.address, from);
-                            channel.send(handshakeAnswerMessage);
-                            logger.info("Направлен ответ об успешном установлении соединения клиенту: " + from + ", " + handshakeAnswerMessage);
+                    if (address == null) {
+                        Message message = channel.poll();
+                        if (message != null) {
+                            if (message.getClassName().equals(HandshakeDemandMessage.class.getName())) {
+                                Address from = message.getFrom();
+                                logger.info("Получен запрос на установление соединения от: " + from + ", " + message);
+                                connectionMap.put(channel, from);
+                                Message handshakeAnswerMessage = new HandshakeAnswerMessage(this.address, from);
+                                channel.send(handshakeAnswerMessage);
+                                logger.info("Направлен ответ об успешном установлении соединения клиенту: " + from + ", " + handshakeAnswerMessage);
+                            }
                         }
                     }
                 }
-            }
-            if (isConnectionMapReady()) {
-                logger.info("Все связи с клиентами установлены");
-                break;  // Когда карта связей заполнена, прерываем цикл
-            }
-            try {
+                if (isConnectionMapReady()) {
+                    logger.info("Все связи с клиентами установлены");
+                    break;  // Когда карта связей заполнена, прерываем цикл
+                }
                 Thread.sleep(MESSAGE_DELAY);
-            } catch (InterruptedException e) {
-                logger.log(Level.SEVERE, e.toString());
             }
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, e.toString());
+        }
+    }
+
+    // Основная процедура обработки сообщений. Получает сообщение и пересылает его по нужному адресу
+    private void messageHandle() {
+        try {
+            // Ждём, пока не будет инициализирована карта адресов
+            while (!isConnectionMapInitialized) {
+                Thread.sleep(MESSAGE_DELAY);
+            }
+            // Запускаем процедуру обработки сообщений
+            while (true) {
+                for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
+                    MessageChannel channel = entry.getKey();
+                    Message message = channel.poll();
+                    if (message != null) {
+                        logger.info("MessageServer receive the message from: " + message.getFrom() + ". Receive it to: " + message.getTo() + ". " + message);
+                        getChannelByAddress(message.getTo()).send(message);
+                    }
+                }
+                Thread.sleep(MESSAGE_DELAY);
+            }
+
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, e.toString());
         }
     }
 

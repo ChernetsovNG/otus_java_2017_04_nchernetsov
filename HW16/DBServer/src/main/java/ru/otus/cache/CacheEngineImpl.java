@@ -35,7 +35,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
         K key = element.getKey();
         elements.put(key, new SoftReference<>(element));
 
-        /*if (!isEternal) {
+        if (!isEternal) {
             if (lifeTimeMs != 0) {
                 TimerTask lifeTimerTask = getTimerTask(key, lifeElement -> lifeElement.getCreationTime() + lifeTimeMs);
                 timer.schedule(lifeTimerTask, lifeTimeMs);
@@ -44,7 +44,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
                 TimerTask idleTimerTask = getTimerTask(key, idleElement -> idleElement.getLastAccessTime() + idleTimeMs);
                 timer.schedule(idleTimerTask, idleTimeMs);
             }
-        }*/
+        }
     }
 
     @Override
@@ -123,10 +123,13 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
         return new TimerTask() {
             @Override
             public void run() {
-                Element<K, V> checkedElement = elements.get(key).get();
-                if (checkedElement == null ||
-                    isT1BeforeT2(timeFunction.apply(checkedElement), checkedElement.getCurrentTime())) {
-                    elements.remove(key);
+                SoftReference<Element<K, V>> softReference = elements.get(key);
+                if (softReference != null) {
+                    Element<K, V> checkedElement = softReference.get();
+                    if (checkedElement == null ||
+                        isT1BeforeT2(timeFunction.apply(checkedElement), checkedElement.getCurrentTime())) {
+                        elements.remove(key);
+                    }
                 }
             }
         };

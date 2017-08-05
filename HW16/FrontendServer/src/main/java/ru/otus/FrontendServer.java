@@ -22,14 +22,20 @@ public class FrontendServer implements Addressee {
     private static final Logger logger = Logger.getLogger(FrontendServer.class.getName());
 
     private static final String HOST = "localhost";
+
     private static final int PAUSE_MS = 500;
-
-    private static final int DB_QUERY_COUNT = 5;  // Сколько раз обращаемся к базе данных
     private static final int THREADS_NUMBER = 2;
+    private static final int DB_QUERY_COUNT = 5;  // Количество обращений к базе данных
 
-    private volatile boolean handshakeSuccessful = false;
+    private volatile boolean handshakeSuccessful = false;  // Удалось ли установить соединение с сервером
 
-    private final Address address;
+    private SocketClientChannel client;
+
+    private final Address address;  // адрес данного сервера
+
+    public FrontendServer(Address address) {
+        this.address = address;
+    }
 
     public static void main(String[] args) throws Exception {
         int port;
@@ -41,15 +47,11 @@ public class FrontendServer implements Addressee {
         new FrontendServer(new Address("FrontendServer:" + port)).start(port);
     }
 
-    public FrontendServer(Address address) {
-        this.address = address;
-    }
-
     @SuppressWarnings("InfiniteLoopStatement")
     private void start(int port) throws Exception {
         logger.info("FrontendServer process started");
 
-        SocketClientChannel client = new SocketClientManagedChanel(HOST, port);
+        client = new SocketClientManagedChanel(HOST, port);
         client.init();
 
         ExecutorService executor = Executors.newFixedThreadPool(THREADS_NUMBER);
@@ -58,37 +60,8 @@ public class FrontendServer implements Addressee {
         Message handshakeMessage = new HandshakeDemandMessage(address, new Address("MessageServer"));
         client.send(handshakeMessage);
 
-        executor.submit(() -> {
-            try {
-                while (true) {
-                    Message handshakeAnswer = client.take();
-                    if (handshakeAnswer.getClassName().equals(HandshakeAnswerMessage.class.getName())) {
-                        logger.info("Получен ответ об установлении связи от MessageServer");
-                        handshakeSuccessful = true;
-                        break;
-                    } else {
-                        Thread.sleep(PAUSE_MS);
-                    }
-                }
-            } catch (InterruptedException e) {
-                logger.log(Level.SEVERE, e.getMessage());
-            }
-        });
-
-        executor.submit(() -> {
-            try {
-                while (!handshakeSuccessful) {
-                    Thread.sleep(PAUSE_MS);
-                }
-
-                while (true) {
-                    Message answerMessage = client.take();  // Ждём ответа
-                    System.out.println("Receive answer with user id = " + answerMessage.getPayload());
-                }
-            } catch (InterruptedException e) {
-                logger.log(Level.SEVERE, e.getMessage());
-            }
-        });
+        executor.submit(this::handshake);
+        executor.submit(this::handleMessage);
 
         // После установления соединения отправляем сообщение к базе данных
         while (!handshakeSuccessful) {
@@ -97,29 +70,66 @@ public class FrontendServer implements Addressee {
 
         // Несколько раз сделаем запрос к базе данных
         for (int i = 0; i < DB_QUERY_COUNT; i++) {
-            // Генерируем случайный номер пользвоателя для запроса к случайной (из двух) базе
-            Random random = new Random();
+            // запрашиваем у базы данных Id user'а
+            Message messageToDB = generateRandomMessageToDB();
 
-            boolean booleanDB = random.nextBoolean();
-            int randomUserId = random.nextInt(10) + 1;
+            client.send(messageToDB);
 
-            Address dbServerAddress;
-            if (booleanDB) {
-                dbServerAddress = new Address("DBServer:" + PORT1);
-            } else {
-                dbServerAddress = new Address("DBServer:" + PORT2);
-            }
-
-            Message getUserIdByNameMessage = new GetUserIdByNameMessage(address, dbServerAddress, "User" + randomUserId);  // запрашиваем у базы данных Id user'а
-
-            client.send(getUserIdByNameMessage);
-            System.out.println("Message sent: " + getUserIdByNameMessage.toString());
+            System.out.println("Message sent: " + messageToDB);
 
             Thread.sleep(1500);
         }
 
         client.close();
         executor.shutdown();
+    }
+
+    private void handshake() {
+        try {
+            while (true) {
+                Message handshakeAnswer = client.take();
+                if (handshakeAnswer.getClassName().equals(HandshakeAnswerMessage.class.getName())) {
+                    logger.info("Получен ответ об установлении связи от MessageServer");
+                    handshakeSuccessful = true;
+                    break;
+                } else {
+                    Thread.sleep(PAUSE_MS);
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, e.toString());
+        }
+    }
+
+    private void handleMessage() {
+        try {
+            while (!handshakeSuccessful) {
+                Thread.sleep(PAUSE_MS);
+            }
+            while (true) {
+                Message answerMessage = client.take();  // Ждём ответа
+                System.out.println("Receive answer with user id = " + answerMessage.getPayload());
+            }
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, e.toString());
+        }
+    }
+
+    // Генерируем случайный номер пользвоателя для запроса к случайной (из двух) базе
+    private Message generateRandomMessageToDB() {
+        Random random = new Random();
+
+        boolean booleanDB = random.nextBoolean();
+        int randomUserId = random.nextInt(10) + 1;
+
+        Address dbServerAddress;
+        if (booleanDB) {
+            dbServerAddress = new Address("DBServer:" + PORT1);
+        } else {
+            dbServerAddress = new Address("DBServer:" + PORT2);
+        }
+
+        return new GetUserIdByNameMessage(address, dbServerAddress, "User" + randomUserId);
     }
 
     @Override

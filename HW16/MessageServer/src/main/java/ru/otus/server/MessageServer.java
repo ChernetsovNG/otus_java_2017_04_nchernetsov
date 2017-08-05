@@ -63,6 +63,7 @@ public class MessageServer implements MessageServerMBean, Addressee {
                 logger.info("Client connect: " + client1);
                 SocketClientChannel channel1 = new SocketClientChannel(client1);
                 channel1.init();
+                channel1.addShutdownRegistration(() -> connectionMap.remove(channel1));
                 connectionMap.put(channel1, null);
 
                 Socket client2 = serverSocket2.accept();  // blocks
@@ -70,6 +71,7 @@ public class MessageServer implements MessageServerMBean, Addressee {
                 logger.info("Client connect: " + client2);
                 SocketClientChannel channel2 = new SocketClientChannel(client2);
                 channel2.init();
+                channel2.addShutdownRegistration(() -> connectionMap.remove(channel2));
                 connectionMap.put(channel2, null);
             }
         }

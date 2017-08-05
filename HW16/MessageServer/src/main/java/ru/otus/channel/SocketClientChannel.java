@@ -12,10 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.List;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,17 +25,22 @@ public class SocketClientChannel implements MessageChannel {
     private final BlockingQueue<Message> input = new LinkedBlockingQueue<>();
 
     private final ExecutorService executor;
-
     private final Socket client;
+    private final List<Runnable> shutdownRegistrations;
 
     public SocketClientChannel(Socket client) {
         this.client = client;
         this.executor = Executors.newFixedThreadPool(WORKERS_COUNT);
+        this.shutdownRegistrations = new CopyOnWriteArrayList<>();
     }
 
     public void init() {
         executor.execute(this::sendMessage);
         executor.execute(this::receiveMessage);
+    }
+
+    public void addShutdownRegistration(Runnable runnable) {
+        this.shutdownRegistrations.add(runnable);
     }
 
     private void receiveMessage() {
@@ -99,6 +102,9 @@ public class SocketClientChannel implements MessageChannel {
 
     @Override
     public void close() throws IOException {
+        shutdownRegistrations.forEach(Runnable::run);
+        shutdownRegistrations.clear();
+
         executor.shutdown();
     }
 }

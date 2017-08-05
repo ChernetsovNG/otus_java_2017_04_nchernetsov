@@ -41,7 +41,7 @@ public class DBServiceImpl implements DBService {
         sessionFactory = createSessionFactory(configuration);
 
         // Создаём кеш
-        cache = new CacheEngineImpl<>(5, 3_000, 0, false);
+        cache = new CacheEngineImpl<>(5, 50_000, 0, false);
     }
 
     public String getLocalStatus() {

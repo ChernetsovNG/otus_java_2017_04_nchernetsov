@@ -12,21 +12,16 @@ import ru.otus.cache.Element;
 import ru.otus.dataSet.AddressDataSet;
 import ru.otus.dataSet.PhoneDataSet;
 import ru.otus.dataSet.UserDataSet;
-import ru.otus.messageSystem.Address;
-import ru.otus.messageSystem.Addressee;
-import ru.otus.messageSystem.MessageSystemContext;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-public class DBServiceImpl implements DBService, Addressee {
+public class DBServiceImpl implements DBService {
     private final SessionFactory sessionFactory;
     private final CacheEngine<Long, UserDataSet> cache;
-    private final Address address;
-    private final MessageSystemContext context;
 
-    public DBServiceImpl(MessageSystemContext context, Address address) {
+    public DBServiceImpl() {
         Configuration configuration = new Configuration();
 
         configuration.addAnnotatedClass(UserDataSet.class);
@@ -47,9 +42,6 @@ public class DBServiceImpl implements DBService, Addressee {
 
         // Создаём кеш
         cache = new CacheEngineImpl<>(5, 3_000, 0, false);
-
-        this.context = context;
-        this.address = address;
     }
 
     public String getLocalStatus() {
@@ -58,7 +50,6 @@ public class DBServiceImpl implements DBService, Addressee {
 
     @Override
     public void init() {
-        context.getMessageSystem().addAddressee(this);
     }
 
     @Override
@@ -129,11 +120,6 @@ public class DBServiceImpl implements DBService, Addressee {
     @Override
     public void shutdown() {
         sessionFactory.close();
-    }
-
-    @Override
-    public Address getAddress() {
-        return address;
     }
 
     private <R> R runInSession(Function<Session, R> function) {

@@ -1,8 +1,9 @@
 package ru.otus;
 
-import ru.otus.app.Msg;
+import ru.otus.app.Message;
 import ru.otus.channel.SocketClientChannel;
-import ru.otus.messages.PingMsg;
+import ru.otus.channel.SocketClientManagedChanel;
+import ru.otus.messages.PingMessage;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,18 +14,17 @@ public class DBServer {
     private static final Logger logger = Logger.getLogger(DBServer.class.getName());
 
     private static final String HOST = "localhost";
-    private static final int PORT = 5052;
     private static final int PAUSE_MS = 5000;
     private static final int MAX_MESSAGES_COUNT = 10;
 
-
     public static void main(String[] args) throws Exception {
-        new DBServer().start();
+        int port = Integer.parseInt(args[0]);
+        new DBServer().start(port);
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
-    private void start() throws Exception {
-        SocketClientChannel client = new SocketClientManagedChanel(HOST, PORT);
+    private void start(int port) throws Exception {
+        SocketClientChannel client = new SocketClientManagedChanel(HOST, port);
         client.init();
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -41,9 +41,9 @@ public class DBServer {
 
         int count = 0;
         while (count < MAX_MESSAGES_COUNT) {
-            Msg msg = new PingMsg();
-            client.send(msg);
-            System.out.println("Message sent: " + msg.toString());
+            Message message = new PingMessage("DBServer " + port);
+            client.send(message);
+            System.out.println("Message sent: " + message.toString());
             Thread.sleep(PAUSE_MS);
             count++;
         }

@@ -7,12 +7,14 @@ public abstract class Message {
     private final Address from;
     private final Address to;
     private final String className;
+    private final String payload;  // "полезная нагрузка", т.е. само содержание сообщения
 
     public static final String CLASS_NAME_VARIABLE = "className";
 
-    protected Message(Address from, Address to, Class<?> klass) {
+    protected Message(Address from, Address to, String payload, Class<?> klass) {
         this.from = from;
         this.to = to;
+        this.payload = payload;
         this.className = klass.getName();
     }
 
@@ -24,9 +26,21 @@ public abstract class Message {
         return to;
     }
 
+    public String getPayload() {
+        return payload;
+    }
+
     public String getClassName() {
         return className;
     }
 
-    public abstract void exec(Addressee addressee);
+    @Override
+    public String toString() {
+        return "Message{" +
+            "from=" + from +
+            ", to=" + to +
+            ", className='" + className + '\'' +
+            ", payload='" + payload + '\'' +
+            '}';
+    }
 }

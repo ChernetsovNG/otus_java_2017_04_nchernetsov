@@ -28,6 +28,7 @@ public class MessageServer implements MessageServerMBean, Addressee {
 
     private final ExecutorService executor;
     private final Map<MessageChannel, Address> connectionMap;  // карта вида <Канал для передачи сообщения - Соответствующий ему адрес>
+    private static volatile boolean isConnectionMapInitialized = false;
     private final Address address;
 
     public MessageServer() {
@@ -36,9 +37,17 @@ public class MessageServer implements MessageServerMBean, Addressee {
         address = new Address("MessageServer");
     }
 
+    public static void main(String[] args) {
+        try {
+            new MessageServer().start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void start() throws Exception {
         executor.submit(this::handshake);
-        //executor.submit(this::mirror);
+        executor.submit(this::messageHandle);
 
         // Ждём подключения к серверу на двух портах. Для подключенных серверов создаём каналы для связи
         // и сохраняем эти каналы в карте
@@ -64,22 +73,36 @@ public class MessageServer implements MessageServerMBean, Addressee {
                 connectionMap.put(channel2, null);
             }
         }
-
-
     }
 
-/*    private Object mirror() throws InterruptedException {
+    // Основная процедура обработки сообщений. Получает сообщение и пересылает его по нужному адресу
+    private void messageHandle() {
+        // Ждём, пока не будет инициализирована карта адресов
+        while (!isConnectionMapInitialized) {
+            try {
+                Thread.sleep(MESSAGE_DELAY);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        // Запускаем процедуру обработки сообщений
         while (true) {
-            for (MessageChannel channel : channels) {
+            for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
+                MessageChannel channel = entry.getKey();
+
                 Message message = channel.poll();
                 if (message != null) {
-                    System.out.println("Mirroring the message: " + message.toString() + " from: " + ((PingMessage) message).getFrom());
-                    channel.send(message);
+                    logger.info("MessageServer receive the message from: " + message.getFrom() + ". Receive it to: " + message.getTo() + ". " + message);
+                    getChannelByAddress(message.getTo()).send(message);
                 }
             }
-            Thread.sleep(MESSAGE_DELAY);
+            try {
+                Thread.sleep(MESSAGE_DELAY);
+            } catch (InterruptedException e) {
+                logger.log(Level.SEVERE, e.toString());
+            }
         }
-    }*/
+    }
 
     // Принимаем идентифицирующие сообщение, и сохраняем в карте соответствие адресата и его канала
     private void handshake() {
@@ -104,10 +127,11 @@ public class MessageServer implements MessageServerMBean, Addressee {
                     if (message != null) {
                         if (message.getClassName().equals(HandshakeDemandMessage.class.getName())) {
                             Address from = message.getFrom();
-                            logger.info("Получен запрос на установление соединения от: " + from);
+                            logger.info("Получен запрос на установление соединения от: " + from + ", " + message);
                             connectionMap.put(channel, from);
-                            logger.info("Направлен ответ об успешном установлении соединения клиенту: " + from);
-                            channel.send(new HandshakeAnswerMessage(address, from));
+                            Message handshakeAnswerMessage = new HandshakeAnswerMessage(this.address, from);
+                            channel.send(handshakeAnswerMessage);
+                            logger.info("Направлен ответ об успешном установлении соединения клиенту: " + from + ", " + handshakeAnswerMessage);
                         }
                     }
                 }
@@ -134,7 +158,21 @@ public class MessageServer implements MessageServerMBean, Addressee {
                 return false;
             }
         }
+        isConnectionMapInitialized = true;
+
+        System.out.println("Connection map is: " + connectionMap);
+
         return true;
+    }
+
+    // Находим по адресу соответствующий ему канал
+    private MessageChannel getChannelByAddress(Address address) {
+        for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
+            if (entry.getValue().equals(address)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     @Override

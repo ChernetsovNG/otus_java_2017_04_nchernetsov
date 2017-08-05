@@ -35,7 +35,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
         K key = element.getKey();
         elements.put(key, new SoftReference<>(element));
 
-        if (!isEternal) {
+        /*if (!isEternal) {
             if (lifeTimeMs != 0) {
                 TimerTask lifeTimerTask = getTimerTask(key, lifeElement -> lifeElement.getCreationTime() + lifeTimeMs);
                 timer.schedule(lifeTimerTask, lifeTimeMs);
@@ -44,7 +44,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
                 TimerTask idleTimerTask = getTimerTask(key, idleElement -> idleElement.getLastAccessTime() + idleTimeMs);
                 timer.schedule(idleTimerTask, idleTimeMs);
             }
-        }
+        }*/
     }
 
     @Override

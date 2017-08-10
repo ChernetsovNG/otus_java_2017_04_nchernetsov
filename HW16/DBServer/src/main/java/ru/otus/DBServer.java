@@ -15,21 +15,25 @@ import ru.otus.messages.HandshakeDemandMessage;
 import ru.otus.messages.UserIdDBAnswerMessage;
 
 import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static ru.otus.server.MessageServer.PORT2;
+import static ru.otus.server.MessageServer.PORT;
 
 public class DBServer implements Addressee {
-    private static final Logger logger = Logger.getLogger(DBServer.class.getName());
+    private static final Logger LOG = Logger.getLogger(DBServer.class.getName());
+    public static final AtomicInteger dbServerNum = new AtomicInteger(0);  // номер сервера
 
     private static final int THREADS_NUMBER = 2;
     private static final String HOST = "localhost";
 
     private static final int PAUSE_MS = 500;
-    private volatile boolean handshakeSuccessful = false;
+
+    private final CountDownLatch handshakeLatch = new CountDownLatch(1);
 
     private SocketClientChannel client;
 
@@ -42,19 +46,14 @@ public class DBServer implements Addressee {
     }
 
     public static void main(String[] args) throws Exception {
-        int port;
-        if (args.length > 0) {
-            port = Integer.parseInt(args[0]);  // Порт для подключения к серверу принимаем в параметрах командной строки
-        } else {
-            port = PORT2;
-        }
         // Запускаем сервер
-        new DBServer(new Address("DBServer:" + port)).start(port);
+        new DBServer(new Address("DBServer:" + dbServerNum.incrementAndGet())).start();
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
-    private void start(int port) throws Exception {
+    private void start() throws Exception {
         // Заполняем базу данных тестовыми данными
+        LOG.info("Init database and populate it");
         for (int i = 1; i <= 10; i++) {
             UserDataSet userDataSet = new UserDataSet("User" + i,
                 new AddressDataSet("Street" + i, i * i),
@@ -63,14 +62,18 @@ public class DBServer implements Addressee {
             dbService.save(userDataSet);
         }
 
-        client = new SocketClientManagedChanel(HOST, port);
+        client = new SocketClientManagedChanel(HOST, PORT);
         client.init();
+
+        LOG.info("Connection with SocketServer is successful");
 
         ExecutorService executor = Executors.newFixedThreadPool(THREADS_NUMBER);
 
         // Вначале отправляем на сервер сообщений Handshake сообщение
         Message handshakeMessage = new HandshakeDemandMessage(address, new Address("MessageServer"));
         client.send(handshakeMessage);
+
+        LOG.info("Handshake message sending...");
 
         executor.submit(this::handshake);  // ожидаем ответа об успешном установлении соединения
         executor.submit(this::handleMessage);  // Принимаем сообщения от сервера сообщений
@@ -91,8 +94,8 @@ public class DBServer implements Addressee {
             while (true) {
                 Message handshakeAnswer = client.take();
                 if (handshakeAnswer.getClassName().equals(HandshakeAnswerMessage.class.getName())) {
-                    logger.info("Получен ответ об установлении связи от MessageServer");
-                    handshakeSuccessful = true;
+                    LOG.info("Получен ответ об установлении связи от MessageServer");
+                    handshakeLatch.countDown();
                     break;
                 } else {
                     Thread.sleep(PAUSE_MS);
@@ -105,24 +108,23 @@ public class DBServer implements Addressee {
 
     private void handleMessage() {
         try {
-            while (!handshakeSuccessful) {
-                Thread.sleep(PAUSE_MS);
-            }
+            handshakeLatch.await();
+            LOG.info("Начат цикл обработки сообщений");
             while (true) {
                 Message message = client.take();
-                logger.info("Message received: " + message.toString());
+                LOG.info("Message received: " + message.toString());
                 // Если приняли запрос на получение Id пользователя из БД, то отправляем ответ
                 if (message.getClassName().equals(GetUserIdByNameMessage.class.getName())) {
-                    logger.info("Получен запрос на получение id пользователя");
+                    LOG.info("Получен запрос на получение id пользователя");
                     long userId = dbService.getUserId(message.getPayload());
                     Message userIdDBAnswerMessage = new UserIdDBAnswerMessage(address, message.getFrom(), String.valueOf(userId));
-                    logger.info("Клиенту отправлен ответ: " + userIdDBAnswerMessage);
+                    LOG.info("Клиенту отправлен ответ: " + userIdDBAnswerMessage);
                     client.send(userIdDBAnswerMessage);
                 }
                 Thread.sleep(PAUSE_MS);
             }
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, e.getMessage());
+            LOG.log(Level.SEVERE, e.getMessage());
         }
     }
 

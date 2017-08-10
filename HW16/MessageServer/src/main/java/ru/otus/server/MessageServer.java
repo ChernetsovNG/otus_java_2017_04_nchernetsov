@@ -5,6 +5,7 @@ import ru.otus.app.MessageChannel;
 import ru.otus.channel.SocketClientChannel;
 import ru.otus.messageSystem.Address;
 import ru.otus.messageSystem.Addressee;
+import ru.otus.messages.AddressNotRegisteredMessage;
 import ru.otus.messages.HandshakeAnswerMessage;
 import ru.otus.messages.HandshakeDemandMessage;
 
@@ -18,17 +19,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MessageServer implements MessageServerMBean, Addressee {
-    private static final Logger logger = Logger.getLogger(MessageServer.class.getName());
+    private static final Logger LOG = Logger.getLogger(MessageServer.class.getName());
 
-    private static final int THREADS_NUMBER = 4;
-    private static final int CLIENTS_NUMBER = 4;
-    public static final int PORT1 = 5050;
-    public static final int PORT2 = 5051;
+    public static final int PORT = 5050;
+    private static final int THREADS_NUMBER = 5;
     private static final int MESSAGE_DELAY = 100;
 
     private final ExecutorService executor;
     private final Map<MessageChannel, Address> connectionMap;  // карта вида <Канал для передачи сообщения - Соответствующий ему адрес>
-    private static volatile boolean isConnectionMapInitialized = false;
     private final Address address;
 
     public MessageServer() {
@@ -49,30 +47,19 @@ public class MessageServer implements MessageServerMBean, Addressee {
         executor.submit(this::handshake);
         executor.submit(this::messageHandle);
 
-        // Ждём подключения к серверу на двух портах. Для подключенных серверов создаём каналы для связи
+        // Ждём подключения к серверу. Для подключенных серверов создаём каналы для связи
         // и сохраняем эти каналы в карте
-        try (ServerSocket serverSocket1 = new ServerSocket(PORT1);
-             ServerSocket serverSocket2 = new ServerSocket(PORT2)) {
-
-            logger.info("Server started on port: " + serverSocket1.getLocalPort());
-            logger.info("Server started on port: " + serverSocket2.getLocalPort());
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            LOG.info("Server started on port: " + serverSocket.getLocalPort());
 
             while (!executor.isShutdown()) {
-                Socket client1 = serverSocket1.accept();  // blocks
+                Socket client = serverSocket.accept();  // blocks
 
-                logger.info("Client connect: " + client1);
-                SocketClientChannel channel1 = new SocketClientChannel(client1);
-                channel1.init();
-                channel1.addShutdownRegistration(() -> connectionMap.remove(channel1));
-                connectionMap.put(channel1, null);
-
-                Socket client2 = serverSocket2.accept();  // blocks
-
-                logger.info("Client connect: " + client2);
-                SocketClientChannel channel2 = new SocketClientChannel(client2);
-                channel2.init();
-                channel2.addShutdownRegistration(() -> connectionMap.remove(channel2));
-                connectionMap.put(channel2, null);
+                LOG.info("Client connect: " + client);
+                SocketClientChannel channel = new SocketClientChannel(client);
+                channel.init();
+                channel.addShutdownRegistration(() -> connectionMap.remove(channel));
+                connectionMap.put(channel, null);
             }
         }
     }
@@ -80,11 +67,8 @@ public class MessageServer implements MessageServerMBean, Addressee {
     // Принимаем идентифицирующие сообщение, и сохраняем в карте соответствие адресата и его канала
     private void handshake() {
         try {
-            // Ждём, пока подключатся все клиенты
-            while (connectionMap.size() < CLIENTS_NUMBER) {
-                Thread.sleep(MESSAGE_DELAY);
-            }
-            // После этого сохраняем адреса подключённых клиентов
+            // Сохраняем адреса подключённых клиентов
+            LOG.info("Начат цикл приёма адресов от клиентов (handshake)...");
             while (true) {
                 for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
                     MessageChannel channel = entry.getKey();
@@ -95,66 +79,53 @@ public class MessageServer implements MessageServerMBean, Addressee {
                         if (message != null) {
                             if (message.getClassName().equals(HandshakeDemandMessage.class.getName())) {
                                 Address from = message.getFrom();
-                                logger.info("Получен запрос на установление соединения от: " + from + ", " + message);
+                                LOG.info("Получен запрос на установление соединения от: " + from + ", " + message);
                                 connectionMap.put(channel, from);
                                 Message handshakeAnswerMessage = new HandshakeAnswerMessage(this.address, from);
                                 channel.send(handshakeAnswerMessage);
-                                logger.info("Направлен ответ об успешном установлении соединения клиенту: " + from + ", " + handshakeAnswerMessage);
+                                LOG.info("Направлен ответ об успешном установлении соединения клиенту: " + from + ", " + handshakeAnswerMessage);
                             }
                         }
                     }
                 }
-                if (isConnectionMapReady()) {
-                    logger.info("Все связи с клиентами установлены");
-                    break;  // Когда карта связей заполнена, прерываем цикл
-                }
                 Thread.sleep(MESSAGE_DELAY);
             }
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, e.toString());
+            LOG.log(Level.SEVERE, e.toString());
         }
     }
 
-    // Основная процедура обработки сообщений. Получает сообщение и пересылает его по нужному адресу
+    // Основная процедура обработки сообщений. Получает сообщение и пересылает его по нужному адресу,
+    // если этот адрес зарегистрирован. Иначе отправляет сообщение о том, что адрес не зарегистирован
     private void messageHandle() {
         try {
-            // Ждём, пока не будет инициализирована карта адресов
-            while (!isConnectionMapInitialized) {
-                Thread.sleep(MESSAGE_DELAY);
-            }
             // Запускаем процедуру обработки сообщений
+            LOG.info("Начат цикл обработки сообщений");
             while (true) {
                 for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
-                    MessageChannel channel = entry.getKey();
-                    Message message = channel.poll();
-                    if (message != null) {
-                        logger.info("MessageServer receive the message from: " + message.getFrom() + ". Receive it to: " + message.getTo() + ". " + message);
-                        getChannelByAddress(message.getTo()).send(message);
+                    MessageChannel channelFrom = entry.getKey();
+                    Address addressFrom = entry.getValue();
+                    // если соединение с этим клиентом уже было ранее установлено
+                    if (addressFrom != null) {
+                        Message message = channelFrom.poll();
+                        if (message != null) {
+                            MessageChannel channelTo = getChannelByAddress(message.getTo());
+                            // если адресат уже в карте, то посылаем ему сообщение
+                            if (connectionMap.containsKey(channelTo)) {
+                                LOG.info("MessageServer receive the message from: " + message.getFrom() + ". Receive it to: " + message.getTo() + ". " + message);
+                                channelTo.send(message);
+                            } else {  // иначе посылаем обратно сообщение о том, что адресат ещё не был добавлен
+                                LOG.info("Адресат для сообщения " + message + " ещё не был добавлен в карту соединений");
+                                channelFrom.send(new AddressNotRegisteredMessage(this.getAddress(), message.getFrom()));
+                            }
+                        }
                     }
                 }
                 Thread.sleep(MESSAGE_DELAY);
             }
-
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, e.toString());
+            LOG.log(Level.SEVERE, e.toString());
         }
-    }
-
-    private boolean isConnectionMapReady() {
-        if (connectionMap.size() == 0) {
-            return false;
-        }
-        for (Map.Entry<MessageChannel, Address> entry : connectionMap.entrySet()) {
-            Address address = entry.getValue();
-            if (address == null) {
-                return false;
-            }
-        }
-        isConnectionMapInitialized = true;
-
-        System.out.println("Connection map is: " + connectionMap);
-
-        return true;
     }
 
     // Находим по адресу соответствующий ему канал
@@ -176,7 +147,7 @@ public class MessageServer implements MessageServerMBean, Addressee {
     public void setRunning(boolean running) {
         if (!running) {
             executor.shutdown();
-            logger.info("Bye.");
+            LOG.info("Bye.");
         }
     }
 

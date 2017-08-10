@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 
 // Запускает отдельный процесс (JVM)
 public class ProcessRunnerImpl implements ProcessRunner {
+    private static final Logger LOG = Logger.getLogger(ProcessRunnerImpl.class.getName());
+
     private final StringBuffer out = new StringBuffer();
     private Process process;
 
@@ -30,6 +32,8 @@ public class ProcessRunnerImpl implements ProcessRunner {
         ProcessBuilder pb = new ProcessBuilder(command.split(" "));
         pb.redirectErrorStream(true);
         Process p = pb.start();
+
+        LOG.info("Start process: " + p + "(isAlive = " + p.isAlive() + ")" + " by command: " + command);
 
         //StreamListener errors = new StreamListener(p.getErrorStream(), "ERROR");
         //StreamListener output = new StreamListener(p.getInputStream(), "OUTPUT");

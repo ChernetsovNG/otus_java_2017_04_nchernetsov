@@ -23,7 +23,6 @@ import static ru.otus.server.MessageServer.PORT;
 public class FrontendServer implements Addressee {
     private static final Logger LOG = Logger.getLogger(FrontendServer.class.getName());
 
-    public static final AtomicInteger frontendServerNum = new AtomicInteger(0);  // номер запущенного сервера
     private static final String HOST = "localhost";
 
     private static final int PAUSE_MS = 500;
@@ -41,7 +40,8 @@ public class FrontendServer implements Addressee {
     }
 
     public static void main(String[] args) throws Exception {
-        new FrontendServer(new Address("FrontendServer:" + frontendServerNum.incrementAndGet())).start();
+        int serverNum = Integer.parseInt(args[0]);
+        new FrontendServer(new Address("FrontendServer:" + serverNum)).start();
     }
 
     @SuppressWarnings("InfiniteLoopStatement")

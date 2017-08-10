@@ -26,7 +26,6 @@ import static ru.otus.server.MessageServer.PORT;
 
 public class DBServer implements Addressee {
     private static final Logger LOG = Logger.getLogger(DBServer.class.getName());
-    public static final AtomicInteger dbServerNum = new AtomicInteger(0);  // номер сервера
 
     private static final int THREADS_NUMBER = 2;
     private static final String HOST = "localhost";
@@ -46,8 +45,8 @@ public class DBServer implements Addressee {
     }
 
     public static void main(String[] args) throws Exception {
-        // Запускаем сервер
-        new DBServer(new Address("DBServer:" + dbServerNum.incrementAndGet())).start();
+        int serverNum = Integer.parseInt(args[0]);
+        new DBServer(new Address("DBServer:" + serverNum)).start();
     }
 
     @SuppressWarnings("InfiniteLoopStatement")

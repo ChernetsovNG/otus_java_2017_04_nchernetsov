@@ -8,11 +8,10 @@ import java.util.List;
 import static java.lang.reflect.Modifier.isStatic;
 
 public class InstrumentationAgent {
-    static int bitInByte = 8;
-    static int ByteInKb = 1024;
-    static int byteInMb = ByteInKb * 1024;
+    private static int BYTE_IN_KB = 1024;
+    private static int BYTE_IN_MB = BYTE_IN_KB * 1024;
 
-    private static long complexSize = 0;  //размер объекта и всех его подъобъектов по ссылкам
+    private static long complexSize = 0;  // размер объекта и всех его подъобъектов по ссылкам
     private static List<Object> visitedObjectsList = new ArrayList<>();
 
     private static volatile Instrumentation instrumentation;
@@ -25,21 +24,11 @@ public class InstrumentationAgent {
         instrumentation = inst;
     }
 
-    public static String trimString(String str, int limit) {
-        return (str.length() > limit ? str.substring(0, limit)+"..." : str);
-    }
-
-    public static void printObjectSizeByte(final Object object) {
-        System.out.println("Object: " + trimString(object.toString(), 15) + " of type: " + object.getClass() +
-                " has size of: " + getObjectComplexSize(object) + " bytes\n");
-    }
-
-    public static void printObjectSizeMb(final Object object) {
-        System.out.println("Object: " + trimString(object.toString(), 15) + " of type: " + object.getClass() +
-                " has size of: " + ((double) getObjectComplexSize(object))/byteInMb + " Mb\n");
-    }
-
-    //Основной метод вычисления размера
+    /**
+     * Основной метод вычисления размера объекта
+     * @param object - объект
+     * @return размер объекта в байтах
+     */
     public static long getObjectComplexSize(Object object) {
         complexSize = 0;
         visitedObjectsList.clear();
@@ -55,14 +44,20 @@ public class InstrumentationAgent {
         return complexSize;
     }
 
-    //Обход полей объекта
+    // стандартный метод вычисления размера одиночного объекта
+    private static long getObjectSize(final Object object) {
+        if (instrumentation == null) {
+            throw new IllegalStateException("Agent not initialized.");
+        }
+        return instrumentation.getObjectSize(object);
+    }
+
+    // Обход полей объекта
     private static void goForFields(Object object, Field[] fields) {
         for (Field field : fields) {
-            if (field.getType().isPrimitive()) {
-                //do nothing
-            }
-            else {
-                //рассматриваем не примитивы и не статические поля
+            //рассматриваем не примитивные поля
+            if (!field.getType().isPrimitive()) {
+                // рассматриваем не статические поля
                 if (!isStatic(field.getModifiers())) {
                     field.setAccessible(true);
                     try {
@@ -80,8 +75,8 @@ public class InstrumentationAgent {
         }
     }
 
-    //рекурсивный вызов обхода полей ссылочного поля
-    public static void recursiveCalc(Object object) throws IllegalAccessException {
+    // рекурсивный вызов обхода полей для поля ссылочного типа
+    private static void recursiveCalc(Object object) throws IllegalAccessException {
         complexSize += getObjectSize(object);
         visitedObjectsList.add(object);
 
@@ -91,12 +86,18 @@ public class InstrumentationAgent {
         }
     }
 
-    //стандартный метод вычисления размера одиночного объекта
-    public static long getObjectSize(final Object object) {
-        if (instrumentation == null) {
-            throw new IllegalStateException("Agent not initialized.");
-        }
-        return instrumentation.getObjectSize(object);
+    public static void printObjectSizeByte(final Object object) {
+        System.out.println("Object: " + trimString(object.toString(), 15) + " of type: " + object.getClass() +
+            " has size of: " + getObjectComplexSize(object) + " bytes\n");
+    }
+
+    public static void printObjectSizeMb(final Object object) {
+        System.out.println("Object: " + trimString(object.toString(), 15) + " of type: " + object.getClass() +
+            " has size of: " + ((double) getObjectComplexSize(object)) / BYTE_IN_MB + " Mb\n");
+    }
+
+    private static String trimString(String str, int limit) {
+        return str.length() > limit ? str.substring(0, limit) + "..." : str;
     }
 
 }

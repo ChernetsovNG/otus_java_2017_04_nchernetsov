@@ -8,7 +8,7 @@ import java.util.List;
 import static ru.otus.measure.InstrumentationAgent.getObjectComplexSize;
 import static ru.otus.measure.InstrumentationAgent.printObjectSizeByte;
 
-public class Main2 {
+public class Main {
 
     public static void main(String[] args) throws InterruptedException, IllegalAccessException {
         Runtime runtime = Runtime.getRuntime();

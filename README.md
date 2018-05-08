@@ -25,6 +25,8 @@ n.chernetsov86@gmail.com
 
 * HW3
 
+Самописная реализация ArrayList (список на основе массива)
+
 * HW4
 
 * HW5

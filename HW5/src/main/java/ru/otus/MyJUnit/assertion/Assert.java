@@ -3,14 +3,12 @@ package ru.otus.MyJUnit.assertion;
 public class Assert {
 
   public static void assertEquals(Object expected, Object actual) {
-    if (equalsRegardingNull(expected, actual)) {
-      return;
-    } else {
+    if (!equalsRegardingNull(expected, actual)) {
       throw new TestException("Objects are not equals");
     }
   }
 
-  public static void fail() {
+  private static void fail() {
     throw new TestException();
   }
 

@@ -10,7 +10,7 @@ import ru.otus.MyJUnit.assertion.Assert;
 //Класс, при помощи которого тестируем MyJUnit
 public class ClassForMyJUnitTest {
 
-  public static List<Integer> list = null;
+  private static List<Integer> list = null;
 
   @Before
   public void beforeTest() {
@@ -27,8 +27,7 @@ public class ClassForMyJUnitTest {
 
   @Test
   public void booleanTest() {
-    boolean bool = (5 >= 3);
-    Assert.assertTrue(bool);
+    Assert.assertTrue(5 >= 3);
   }
 
   @Test

@@ -1,5 +1,6 @@
 package ru.otus;
 
+import javafx.util.Builder;
 import ru.otus.exception.NotEnoughMoneyException;
 import ru.otus.memento.Memento;
 import ru.otus.memento.Originator;
@@ -13,7 +14,7 @@ public class ATM implements WithdrawAlgorithm, Originator {
     private Map<Integer, Integer> denominations = new HashMap<>();
     private WithdrawAlgorithm withdrawAlgorithm;
 
-    ATM(int id) {
+    public ATM(int id) {
         this.id = id;
         this.withdrawAlgorithm = new GreedyWithdrawAlgorithm();  // по умолчанию - жадный алгоритм
     }
@@ -29,7 +30,7 @@ public class ATM implements WithdrawAlgorithm, Originator {
         }
     }
 
-    void addAmount(int nominal, int count) {
+    public void addAmount(int nominal, int count) {
         if (denominations.containsKey(nominal)) {
             denominations.put(nominal, denominations.get(nominal) + count);
         } else {

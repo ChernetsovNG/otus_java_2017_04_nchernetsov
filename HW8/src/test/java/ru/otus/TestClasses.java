@@ -26,11 +26,11 @@ class TestClasses {
         @Override
         public String toString() {
             return "ClassWithPrimitives{" +
-                    "intField=" + intField +
-                    ", stringField='" + stringField + '\'' +
-                    ", doubleField=" + doubleField +
-                    ", boolField=" + boolField +
-                    '}';
+                "intField=" + intField +
+                ", stringField='" + stringField + '\'' +
+                ", doubleField=" + doubleField +
+                ", boolField=" + boolField +
+                '}';
         }
     }
 
@@ -52,9 +52,9 @@ class TestClasses {
         @Override
         public String toString() {
             return "ClassWithPrimitiveArray{" +
-                    "intField=" + intField +
-                    ", arrayDouble=" + Arrays.toString(arrayDouble) +
-                    '}';
+                "intField=" + intField +
+                ", arrayDouble=" + Arrays.toString(arrayDouble) +
+                '}';
         }
     }
 
@@ -62,7 +62,7 @@ class TestClasses {
         private int intField = 3;
         private List<Integer> integerList = new ArrayList<>();
 
-        public ClassWithListOfPrimitives() {
+        ClassWithListOfPrimitives() {
             integerList.add(1);
             integerList.add(2);
             integerList.add(7);
@@ -82,9 +82,9 @@ class TestClasses {
         @Override
         public String toString() {
             return "ClassWithListOfPrimitives{" +
-                    "intField=" + intField +
-                    ", integerList=" + integerList +
-                    '}';
+                "intField=" + intField +
+                ", integerList=" + integerList +
+                '}';
         }
     }
 
@@ -92,7 +92,7 @@ class TestClasses {
         private int intField = 4;
         private Set<Integer> integerSet = new HashSet<>();
 
-        public ClassWithSetOfPrimitives() {
+        ClassWithSetOfPrimitives() {
             integerSet.add(1);
             integerSet.add(2);
             integerSet.add(7);
@@ -112,9 +112,9 @@ class TestClasses {
         @Override
         public String toString() {
             return "ClassWithSetOfPrimitives{" +
-                    "intField=" + intField +
-                    ", integerSet=" + integerSet +
-                    '}';
+                "intField=" + intField +
+                ", integerSet=" + integerSet +
+                '}';
         }
     }
 
@@ -122,7 +122,7 @@ class TestClasses {
         private int intField = 5;
         private ClassWithPrimitiveArray objectWithPrimitiveArray;
 
-        public ClassWithObject() {
+        ClassWithObject() {
             this.objectWithPrimitiveArray = new TestClasses().new ClassWithPrimitiveArray();
         }
 
@@ -140,9 +140,9 @@ class TestClasses {
         @Override
         public String toString() {
             return "ClassWithObject{" +
-                    "intField=" + intField +
-                    ", objectWithPrimitiveArray=" + objectWithPrimitiveArray +
-                    '}';
+                "intField=" + intField +
+                ", objectWithPrimitiveArray=" + objectWithPrimitiveArray +
+                '}';
         }
     }
 
@@ -150,7 +150,7 @@ class TestClasses {
         private int intField = 6;
         private List<ClassWithPrimitiveArray> listWithObjects = new ArrayList<>();
 
-        public ClassWithListOfObjects() {
+        ClassWithListOfObjects() {
             listWithObjects.add(new TestClasses().new ClassWithPrimitiveArray());
             listWithObjects.add(new TestClasses().new ClassWithPrimitiveArray());
             listWithObjects.add(new TestClasses().new ClassWithPrimitiveArray());
@@ -170,9 +170,40 @@ class TestClasses {
         @Override
         public String toString() {
             return "ClassWithListOfObjects{" +
-                    "intField=" + intField +
-                    ", listWithObjects=" + listWithObjects +
-                    '}';
+                "intField=" + intField +
+                ", listWithObjects=" + listWithObjects +
+                '}';
+        }
+    }
+
+    class User {
+        private int id;
+        private String name;
+        private int age;
+
+        public User() {
+            this.id = 1;
+            this.name = "Nikita";
+            this.age = 31;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            User user = (User) o;
+            return id == user.id &&
+                age == user.age &&
+                Objects.equals(name, user.name);
+        }
+
+        @Override
+        public String toString() {
+            return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                '}';
         }
     }
 }

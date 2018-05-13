@@ -1,13 +1,13 @@
-package ru.otus.utils;
+package ru.otus;
 
 import java.lang.reflect.Field;
 
 @SuppressWarnings("SameParameterValue")
-public class ReflectionHelper {
+final class ReflectionHelper {
     private ReflectionHelper() {
     }
 
-    public static Object getFieldValue(Object object, String name) {
+    static Object getFieldValue(Object object, String name) {
         Field field = null;
         boolean isAccessible = true;
         try {

@@ -1,62 +1,25 @@
 package ru.otus;
 
-import ru.otus.memento.Memento;
+public interface ATMDepartment {
+    void addATM();
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+    void addATM(ATM atm);
 
-class ATMDepartment {
-    private final Map<Integer, ATM> atmMap = new HashMap<>();
-    private final Map<Integer, Memento> atmsMemento = new HashMap<>();
+    void deleteATM(int id);
 
-    // создать ATM с новым id
-    private ATM getNextATM() {
-        int maxId;
-        if (atmMap.size() == 0) {
-            maxId = -1;
-        } else {
-            maxId = atmMap.keySet().stream().max(Comparator.naturalOrder()).orElse(null);
-        }
-        return new ATM(maxId + 1);
-    }
+    ATM getATMbyID(int id);
 
-    void addATM() {
-        ATM atm = getNextATM();
-        atmMap.put(atm.getId(), atm);
-        atmsMemento.put(atm.getId(), atm.getMemento());
-    }
+    /**
+     * Списать сумму остатков со всех ATM
+     *
+     * @return - сумма остатков
+     */
+    int getAllATMsRemainderSum();
 
-    void addATM(ATM atm) {
-        atmMap.put(atm.getId(), atm);
-        atmsMemento.put(atm.getId(), atm.getMemento());
-    }
+    /**
+     * Восстановить начальное состояние всех ATM
+     */
+    void restoreATMsInitialState();
 
-    public void deleteATM(int id) {
-        atmMap.remove(id);
-    }
-
-    ATM getATMbyID(int id) {
-        return atmMap.get(id);
-    }
-
-    int size() {
-        return atmMap.size();
-    }
-
-    // Списать сумму остатков
-    int getAllATMsRemainderSum() {
-        int sum = atmMap.values().stream().mapToInt(ATM::getTotalAmount).sum();
-        atmMap.values().forEach(ATM::withdrawTotalAmount);
-        return sum;
-    }
-
-    void restoreATMsInitialState() {
-        atmMap.values().forEach(
-            atm -> {
-                Memento memento = atmsMemento.get(atm.getId());
-                atm.setMemento(memento);
-            });
-    }
-
+    int atmCount();
 }

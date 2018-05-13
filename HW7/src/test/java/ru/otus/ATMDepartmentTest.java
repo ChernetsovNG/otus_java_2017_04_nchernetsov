@@ -7,11 +7,11 @@ import ru.otus.exception.NotEnoughMoneyException;
 public class ATMDepartmentTest {
     @Test
     public void ATMDepartmentAddSomeATMsTest() {
-        ATMDepartment atmDepartment = new ATMDepartment();
+        ATMDepartment atmDepartment = new ATMDepartmentImpl();
         atmDepartment.addATM();
         atmDepartment.addATM();
         atmDepartment.addATM();
-        Assert.assertEquals(3, atmDepartment.size());
+        Assert.assertEquals(3, atmDepartment.atmCount());
         Assert.assertEquals(2, atmDepartment.getATMbyID(2).getId());
     }
 
@@ -25,7 +25,7 @@ public class ATMDepartmentTest {
         atm2.addAmount(200, 3);
         atm3.addAmount(500, 3);
 
-        ATMDepartment atmDepartment = new ATMDepartment();
+        ATMDepartment atmDepartment = new ATMDepartmentImpl();
 
         atmDepartment.addATM(atm1);
         atmDepartment.addATM(atm2);
@@ -49,7 +49,7 @@ public class ATMDepartmentTest {
         atm2.addAmount(200, 3);
         atm3.addAmount(500, 3);
 
-        ATMDepartment atmDepartment = new ATMDepartment();
+        ATMDepartment atmDepartment = new ATMDepartmentImpl();
 
         atmDepartment.addATM(atm1);
         atmDepartment.addATM(atm2);

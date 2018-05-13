@@ -10,7 +10,7 @@ class ATMDepartment {
     private final Map<Integer, ATM> atmMap = new HashMap<>();
     private final Map<Integer, Memento> atmsMemento = new HashMap<>();
 
-    //создать ATM с новым id
+    // создать ATM с новым id
     private ATM getNextATM() {
         int maxId;
         if (atmMap.size() == 0) {
@@ -44,20 +44,19 @@ class ATMDepartment {
         return atmMap.size();
     }
 
-    //Списать сумму остатков
+    // Списать сумму остатков
     int getAllATMsRemainderSum() {
         int sum = atmMap.values().stream().mapToInt(ATM::getTotalAmount).sum();
         atmMap.values().forEach(ATM::withdrawTotalAmount);
-
         return sum;
     }
 
     void restoreATMsInitialState() {
         atmMap.values().forEach(
-                atm -> {
-                    Memento memento = atmsMemento.get(atm.getId());
-                    atm.setMemento(memento);
-                });
+            atm -> {
+                Memento memento = atmsMemento.get(atm.getId());
+                atm.setMemento(memento);
+            });
     }
 
 }

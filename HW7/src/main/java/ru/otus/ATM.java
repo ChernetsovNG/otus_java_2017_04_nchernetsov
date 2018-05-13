@@ -15,7 +15,7 @@ public class ATM implements WithdrawAlgorithm, Originator {
 
     ATM(int id) {
         this.id = id;
-        this.withdrawAlgorithm = new GreedyWithdrawAlgorithm();  //по умолчанию - жадный алгоритм
+        this.withdrawAlgorithm = new GreedyWithdrawAlgorithm();  // по умолчанию - жадный алгоритм
     }
 
     void setWithdrawAlgorithm(WithdrawAlgorithmType algorithmType) {
@@ -59,14 +59,16 @@ public class ATM implements WithdrawAlgorithm, Originator {
     }
 
     boolean hasMoney() {
-        return (denominations.size() > 0);
+        return denominations.size() > 0;
     }
 
     boolean isAmountAvailable(int expectedAmount) {
-        return (getTotalAmount() >= expectedAmount);
+        return getTotalAmount() >= expectedAmount;
     }
 
-    int getId() { return id; }
+    int getId() {
+        return id;
+    }
 
     @Override
     public Memento getMemento() {
@@ -80,7 +82,9 @@ public class ATM implements WithdrawAlgorithm, Originator {
 
     //Алгоритмы списания денег
 
-    //"Жадный" алгоритм
+    /**
+     * "Жадный" алгоритм
+     */
     private class GreedyWithdrawAlgorithm implements WithdrawAlgorithm {
         @Override
         public Map<Integer, Integer> withdrawAmount(int expectedAmount) throws NotEnoughMoneyException {
@@ -90,26 +94,25 @@ public class ATM implements WithdrawAlgorithm, Originator {
 
             int amount = expectedAmount;
 
-            HashMap<Integer, Integer> denomCopy = new HashMap<>();
-            denomCopy.putAll(denominations);
+            HashMap<Integer, Integer> denomCopy = new HashMap<>(denominations);
 
             List<Integer> nominalListByDesc = new ArrayList<>();
             for (Map.Entry<Integer, Integer> entry : denomCopy.entrySet()) {
                 nominalListByDesc.add(entry.getKey());
             }
             Collections.sort(nominalListByDesc);
-            Collections.reverse(nominalListByDesc);  //список номиналов купюр по убыванию
+            Collections.reverse(nominalListByDesc);  // список номиналов купюр по убыванию
 
             TreeMap<Integer, Integer> withdrawResult = new TreeMap<>(Comparator.reverseOrder());
 
             for (Integer nominal : nominalListByDesc) {
-                int count = denomCopy.get(nominal);  //количество купюр максимального достоинства
+                int count = denomCopy.get(nominal);  // количество купюр максимального достоинства
                 while (true) {
                     if (amount < nominal || count <= 0) {
                         denomCopy.put(nominal, count);
                         break;
                     }
-                    amount -= nominal;  //вычитаем одну купюру максимального достоинства
+                    amount -= nominal;  // вычитаем одну купюру максимального достоинства
                     count--;
 
                     if (withdrawResult.containsKey(nominal))
@@ -123,13 +126,15 @@ public class ATM implements WithdrawAlgorithm, Originator {
                 throw new NotEnoughMoneyException();
             else {
                 denominations.clear();
-                denominations.putAll(denomCopy);  //обновляем хранимые в APM купюры
+                denominations.putAll(denomCopy);  // обновляем хранимые в ATM купюры
                 return withdrawResult;
             }
         }
     }
 
-    //Алгоритм динамического программирования
+    /**
+     * Алгоритм динамического программирования
+     */
     private class DynamicProgrammingWithdrawAlgorithm implements WithdrawAlgorithm {
         @Override
         public Map<Integer, Integer> withdrawAmount(int expectedAmount) throws NotEnoughMoneyException {
@@ -137,16 +142,14 @@ public class ATM implements WithdrawAlgorithm, Originator {
                 throw new NotEnoughMoneyException();
             }
 
-            Map<Integer, Integer> denomByNominalAscend = new TreeMap<>();
-
-            denomByNominalAscend.putAll(denominations);
+            Map<Integer, Integer> denomByNominalAscend = new TreeMap<>(denominations);
 
             Map<Integer, Integer> result = new TreeMap<>(Collections.reverseOrder());
 
             long INF = Long.MAX_VALUE - 1;
 
-            //Массив minBanknoteCount[currSum] содержит минимальное количество банкнот, которыми можно выдать сумму currSum,
-            //либо +INF, если эту сумму выдать невозможно
+            // Массив minBanknoteCount[currSum] содержит минимальное количество банкнот, которыми можно выдать сумму currSum,
+            // либо +INF, если эту сумму выдать невозможно
             long minBanknoteCount[] = new long[expectedAmount + 1];
             minBanknoteCount[0] = 0;
 

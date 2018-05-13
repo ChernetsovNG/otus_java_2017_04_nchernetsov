@@ -2,22 +2,31 @@ package ru.otus.builder;
 
 import ru.otus.ATM;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ATMBuilderImpl implements ATMBuilder {
 
-    private final ATM atm;
+    private final int atmId;
+    private final Map<Integer, Integer> denominations;
 
     public ATMBuilderImpl(int atmId) {
-        atm = new ATM(atmId);
+        this.atmId = atmId;
+        this.denominations = new HashMap<>();
     }
 
     @Override
     public ATMBuilder addAmount(int nominal, int count) {
-        atm.addAmount(nominal, count);
+        if (denominations.containsKey(nominal)) {
+            denominations.put(nominal, denominations.get(nominal) + count);
+        } else {
+            denominations.put(nominal, count);
+        }
         return this;
     }
 
     @Override
     public ATM build() {
-        return atm;
+        return new ATM(atmId, denominations);
     }
 }

@@ -1,6 +1,5 @@
 package ru.otus;
 
-import javafx.util.Builder;
 import ru.otus.exception.NotEnoughMoneyException;
 import ru.otus.memento.Memento;
 import ru.otus.memento.Originator;
@@ -17,6 +16,12 @@ public class ATM implements WithdrawAlgorithm, Originator {
     public ATM(int id) {
         this.id = id;
         this.withdrawAlgorithm = new GreedyWithdrawAlgorithm();  // по умолчанию - жадный алгоритм
+    }
+
+    public ATM(int id, Map<Integer, Integer> denominations) {
+        this.id = id;
+        this.denominations.putAll(denominations);
+        this.withdrawAlgorithm = new GreedyWithdrawAlgorithm();
     }
 
     void setWithdrawAlgorithm(WithdrawAlgorithmType algorithmType) {

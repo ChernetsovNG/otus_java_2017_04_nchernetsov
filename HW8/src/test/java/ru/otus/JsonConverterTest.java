@@ -8,14 +8,14 @@ import static org.junit.Assert.assertEquals;
 public class JsonConverterTest {
     private static final TestClasses testClasses = new TestClasses();
     private static final Gson gson = new Gson();
-    private static final JsonConverter jsonConverter = new JsonConverter();
+    private static final JsonConverter jsonConverterMyImpl = new JsonConverterMyImpl();
 
     @Test
     public void objectWithPrimitivesTest() {
         TestClasses.ClassWithPrimitives objectWithPrimitives = testClasses.new ClassWithPrimitives();
 
         String jsonByGson = gson.toJson(objectWithPrimitives);
-        String jsonByMyConverter = jsonConverter.objectToJson(objectWithPrimitives);
+        String jsonByMyConverter = jsonConverterMyImpl.convertToJSON(objectWithPrimitives);
 
         System.out.println(jsonByGson);
         System.out.println();
@@ -28,7 +28,7 @@ public class JsonConverterTest {
         TestClasses.ClassWithPrimitiveArray objectWithPrimitiveArray = testClasses.new ClassWithPrimitiveArray();
 
         String jsonByGson = gson.toJson(objectWithPrimitiveArray);
-        String jsonByMyConverter = jsonConverter.objectToJson(objectWithPrimitiveArray);
+        String jsonByMyConverter = jsonConverterMyImpl.convertToJSON(objectWithPrimitiveArray);
 
         System.out.println(jsonByGson);
         System.out.println();
@@ -41,7 +41,7 @@ public class JsonConverterTest {
         TestClasses.ClassWithListOfPrimitives objectWithListOfPrimitives = testClasses.new ClassWithListOfPrimitives();
 
         String jsonByGson = gson.toJson(objectWithListOfPrimitives);
-        String jsonByMyConverter = jsonConverter.objectToJson(objectWithListOfPrimitives);
+        String jsonByMyConverter = jsonConverterMyImpl.convertToJSON(objectWithListOfPrimitives);
 
         System.out.println(jsonByGson);
         System.out.println();
@@ -54,7 +54,7 @@ public class JsonConverterTest {
         TestClasses.ClassWithSetOfPrimitives objectWithSetOfPrimitives = testClasses.new ClassWithSetOfPrimitives();
 
         String jsonByGson = gson.toJson(objectWithSetOfPrimitives);
-        String jsonByMyConverter = jsonConverter.objectToJson(objectWithSetOfPrimitives);
+        String jsonByMyConverter = jsonConverterMyImpl.convertToJSON(objectWithSetOfPrimitives);
 
         System.out.println(jsonByGson);
         System.out.println();
@@ -67,7 +67,7 @@ public class JsonConverterTest {
         TestClasses.ClassWithObject objectWithObject = testClasses.new ClassWithObject();
 
         String jsonByGson = gson.toJson(objectWithObject);
-        String jsonByMyConverter = jsonConverter.objectToJson(objectWithObject);
+        String jsonByMyConverter = jsonConverterMyImpl.convertToJSON(objectWithObject);
 
         System.out.println(jsonByGson);
         System.out.println();
@@ -80,7 +80,7 @@ public class JsonConverterTest {
         TestClasses.ClassWithListOfObjects objectWithListOfObjects = testClasses.new ClassWithListOfObjects();
 
         String jsonByGson = gson.toJson(objectWithListOfObjects);
-        String jsonByMyConverter = jsonConverter.objectToJson(objectWithListOfObjects);
+        String jsonByMyConverter = jsonConverterMyImpl.convertToJSON(objectWithListOfObjects);
 
         System.out.println(jsonByGson);
         System.out.println();
@@ -93,7 +93,7 @@ public class JsonConverterTest {
         TestClasses.User user = testClasses.new User();
 
         String jsonByGson = gson.toJson(user);
-        String jsonByMyConverter = jsonConverter.objectToJson(user);
+        String jsonByMyConverter = jsonConverterMyImpl.convertToJSON(user);
 
         System.out.println(jsonByGson);
         System.out.println();

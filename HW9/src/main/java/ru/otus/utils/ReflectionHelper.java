@@ -7,10 +7,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("SameParameterValue")
-public class ReflectionHelper {
+public final class ReflectionHelper {
+
     private ReflectionHelper() {
     }
 
@@ -80,15 +80,10 @@ public class ReflectionHelper {
         return null;
     }
 
-    static private Class<?>[] toClasses(Object[] args) {
-        List<Class<?>> classes = Arrays.stream(args).map(Object::getClass).collect(Collectors.toList());
-        return classes.toArray(new Class<?>[classes.size()]);
-    }
-
     static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
         final List<Method> methods = new ArrayList<>();
         Class<?> clazz = type;
-        while (clazz != Object.class) { // need to iterated thought hierarchy in order to retrieve methods from above the current instance
+        while (clazz != Object.class) { // we need to iterate thought hierarchy in order to retrieve methods from above the current instance
             // iterate though the list of methods declared in the class represented by clazz variable, and add those annotated with the specified annotation
             final List<Method> allMethods = new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods()));
             for (final Method method : allMethods) {
@@ -102,6 +97,8 @@ public class ReflectionHelper {
         return methods;
     }
 
-
+    private static Class<?>[] toClasses(Object[] args) {
+        return Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
+    }
 
 }

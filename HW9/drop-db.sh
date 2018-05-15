@@ -12,4 +12,4 @@ else
     export PG_HOST=$1
 fi
 
-psql -h $PG_HOST -U $PG_USER -c "drop database $DB_NAME;"
+psql -h $PG_HOST -U $PG_USER -c "DROP DATABASE IF EXISTS $DB_NAME;"

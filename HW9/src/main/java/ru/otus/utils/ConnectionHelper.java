@@ -10,12 +10,12 @@ public class ConnectionHelper {
         try {
             DriverManager.registerDriver(new org.postgresql.Driver());
 
-            String url = "jdbc:postgresql://" +   //db type
-                    "localhost:" +                //host name
-                    "5432/" +                     //port
-                    "otus_test_db?" +             //db name
-                    "user=postgres&" +            //login
-                    "password=postgres";          //password
+            String url = "jdbc:postgresql://" +  // db type
+                "localhost:" +               // host name
+                "5432/" +                    // port
+                "otus_test_db?" +            // db name
+                "user=postgres&" +           // login
+                "password=postgres";         // password
 
             return DriverManager.getConnection(url);
         } catch (SQLException e) {
@@ -34,4 +34,5 @@ public class ConnectionHelper {
         }
 
     }
+
 }

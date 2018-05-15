@@ -1,12 +1,16 @@
 package ru.otus.orm;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.otus.main.User;
+import ru.otus.entity.User;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ORMTest {
     private static ORM orm = null;
@@ -14,6 +18,10 @@ public class ORMTest {
     @BeforeClass
     public static void processEntityTest() throws Exception {
         orm = new ORM();
+    }
+
+    @Before
+    public void beforeTest() throws SQLException {
         orm.execQuery("TRUNCATE TABLE users;");
     }
 
@@ -50,6 +58,23 @@ public class ORMTest {
 
         assertEquals("User2", user2.getName());
         assertEquals("User3", user3.getName());
+    }
+
+    @Test
+    public void loadAllUsersTest() {
+        List<User> savedUsers = Arrays.asList(
+            new User(1, "User1", 1),
+            new User(2, "User2", 2),
+            new User(3, "User3", 3));
+
+        for (User user : savedUsers) {
+            orm.save(user);
+        }
+
+        List<User> loadedUsers = orm.loadAll(User.class);
+
+        assertTrue(savedUsers.containsAll(loadedUsers));
+        assertTrue(loadedUsers.containsAll(savedUsers));
     }
 
 }

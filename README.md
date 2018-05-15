@@ -47,6 +47,8 @@ n.chernetsov86@gmail.com
 
 * HW9
 
+Самописный ORM, работающий на основе анализа аннотаций JPA и механизма Reflection.
+
 * HW10
 
 * HW11

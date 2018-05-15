@@ -1,7 +1,7 @@
 package ru.otus.orm;
 
 import org.reflections.Reflections;
-import ru.otus.main.User;
+import ru.otus.entity.User;
 import ru.otus.orm.handlers.TResultHandler;
 import ru.otus.utils.ConnectionHelper;
 
@@ -13,9 +13,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static ru.otus.utils.ReflectionHelper.instantiate;
 import static ru.otus.utils.ReflectionHelper.setFieldValue;
@@ -60,28 +58,12 @@ public class ORM implements Executor {
 
     @Override
     public void save(User user) {
-        long id = user.getId();
-        String name = user.getName();
-        int age = user.getAge();
-
         // Имя таблицы в БД, соответствующей сущности User
         String tableName = tableNames.get(User.class);
         // Находим имена столбцов в таблице БД, соответствующие полям класса User
         DataSetDescriptor userDescriptor = matchClassFieldsAndTablesColumnMap.get(User.class);
 
-        String idColumnName = userDescriptor.get("id");
-        String nameColumnName = userDescriptor.get("name");
-        String ageColumnName = userDescriptor.get("age");
-
-        String query = "INSERT INTO " + tableName + " (" +
-            idColumnName + ", " +
-            nameColumnName + ", " +
-            ageColumnName + ") " +
-            "VALUES (" +
-            id + ", " +
-            "'" + name + "'" +
-            ", " + age +
-            ");";
+        String query = insertUserQuery(tableName, userDescriptor, user);
 
         try {
             execQuery(query);
@@ -98,17 +80,7 @@ public class ORM implements Executor {
 
         Object[] columns = classFieldColumnNameMap.values().toArray();  // столбцы таблицы
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("SELECT ");
-        for (int i = 0; i < columns.length-1; i++) {
-            sb.append((String) columns[i]).append(", ");
-        }
-        sb.append((String) columns[columns.length-1]).append(" ");
-        sb.append("FROM ").append(tableName).append(" ")
-            .append("WHERE id = ").append(id).append(";");
-
-        String query = sb.toString();
+        String query = selectUserQuery(tableName, columns, id);
 
         try {
             Map<String, Object> queryResultMap = execQuery(query, resultSet -> {
@@ -120,18 +92,43 @@ public class ORM implements Executor {
                 }
                 return map;
             });
+            return createUserFromQueryResult(clazz, classFieldColumnNameMap, queryResultMap);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-            // Создаём новый объект нужного класса и записываем в соответствующие
-            // поля результаты из запроса к БД
-            Object newObject = instantiate(clazz);
+    @Override
+    public List<User> loadAll(Class<?> clazz) {
+        List<User> result = new ArrayList<>();
 
-            for (Map.Entry<String, String> entry : classFieldColumnNameMap.entrySet()) {
-                String fieldName = entry.getKey();
-                String columnName = entry.getValue();
-                setFieldValue(newObject, fieldName, queryResultMap.get(columnName));
+        String tableName = tableNames.get(clazz);
+
+        DataSetDescriptor classFieldColumnNameMap = matchClassFieldsAndTablesColumnMap.get(clazz);
+
+        Object[] columns = classFieldColumnNameMap.values().toArray();  // столбцы таблицы
+
+        String query = selectAllUsersQuery(tableName, columns);
+
+        try {
+            List<Map<String, Object>> queryResultListOfMaps = execQuery(query, resultSet -> {
+                List<Map<String, Object>> listOfMaps = new ArrayList<>();
+                while (resultSet.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    for (Object column : columns) {
+                        String columnStr = (String) column;
+                        map.put(columnStr, resultSet.getObject(columnStr));
+                    }
+                    listOfMaps.add(map);
+                }
+                return listOfMaps;
+            });
+            for (Map<String, Object> queryResultMap : queryResultListOfMaps) {
+                User user = createUserFromQueryResult(clazz, classFieldColumnNameMap, queryResultMap);
+                result.add(user);
             }
-
-            return (User) newObject;
+            return result;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -152,6 +149,66 @@ public class ORM implements Executor {
         result.close();
         stmt.close();
         return value;
+    }
+
+    // Создаём новый объект нужного класса и записываем в соответствующие
+    // поля результаты из запроса к БД
+    private User createUserFromQueryResult(Class<?> clazz, DataSetDescriptor dataSetDescriptor,
+                                           Map<String, Object> queryResultMap) {
+        Object newObject = instantiate(clazz);
+        for (Map.Entry<String, String> entry : dataSetDescriptor.entrySet()) {
+            String fieldName = entry.getKey();
+            String columnName = entry.getValue();
+            setFieldValue(newObject, fieldName, queryResultMap.get(columnName));
+        }
+        return (User) newObject;
+    }
+
+    private String insertUserQuery(String tableName, DataSetDescriptor userDescriptor, User user) {
+        String idColumnName = userDescriptor.get("id");
+        String nameColumnName = userDescriptor.get("name");
+        String ageColumnName = userDescriptor.get("age");
+
+        long id = user.getId();
+        String name = user.getName();
+        int age = user.getAge();
+
+        return "INSERT INTO " + tableName + " (" +
+            idColumnName + ", " +
+            nameColumnName + ", " +
+            ageColumnName + ") " +
+            "VALUES (" +
+            id + ", " +
+            "'" + name + "'" +
+            ", " + age +
+            ");";
+    }
+
+    private String selectUserQuery(String tableName, Object[] columns, long id) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("SELECT ");
+        for (int i = 0; i < columns.length - 1; i++) {
+            sb.append((String) columns[i]).append(", ");
+        }
+        sb.append((String) columns[columns.length - 1]).append(" ");
+        sb.append("FROM ").append(tableName).append(" ")
+            .append("WHERE id = ").append(id).append(";");
+
+        return sb.toString();
+    }
+
+    private String selectAllUsersQuery(String tableName, Object[] columns) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("SELECT ");
+        for (int i = 0; i < columns.length - 1; i++) {
+            sb.append((String) columns[i]).append(", ");
+        }
+        sb.append((String) columns[columns.length - 1]).append(" ");
+        sb.append("FROM ").append(tableName).append(";");
+
+        return sb.toString();
     }
 
 }

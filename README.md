@@ -51,6 +51,8 @@ n.chernetsov86@gmail.com
 
 * HW10
 
+Пример работы с Hibernate, с использованием паттернов DBService и DAO
+
 * HW11
 
 * HW12

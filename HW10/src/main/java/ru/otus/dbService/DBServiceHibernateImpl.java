@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import ru.otus.base.DBService;
 import ru.otus.base.dataSets.AddressDataSet;
@@ -14,7 +15,6 @@ import ru.otus.dbService.dao.UserDataSetDAO;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.logging.Level;
 
 public class DBServiceHibernateImpl implements DBService {
     private final SessionFactory sessionFactory;
@@ -39,10 +39,12 @@ public class DBServiceHibernateImpl implements DBService {
         sessionFactory = createSessionFactory(configuration);
     }
 
+    @Override
     public String getLocalStatus() {
         return runInSession(session -> session.getTransaction().getStatus().name());
     }
 
+    @Override
     public void save(UserDataSet dataSet) {
         try (Session session = sessionFactory.openSession()) {
             UserDataSetDAO dao = new UserDataSetDAO(session);
@@ -50,6 +52,7 @@ public class DBServiceHibernateImpl implements DBService {
         }
     }
 
+    @Override
     public UserDataSet read(long id) {
         return runInSession(session -> {
             UserDataSetDAO dao = new UserDataSetDAO(session);
@@ -57,6 +60,7 @@ public class DBServiceHibernateImpl implements DBService {
         });
     }
 
+    @Override
     public UserDataSet readByName(String name) {
         return runInSession(session -> {
             UserDataSetDAO dao = new UserDataSetDAO(session);
@@ -64,6 +68,7 @@ public class DBServiceHibernateImpl implements DBService {
         });
     }
 
+    @Override
     public List<UserDataSet> readAll() {
         return runInSession(session -> {
             UserDataSetDAO dao = new UserDataSetDAO(session);
@@ -71,6 +76,7 @@ public class DBServiceHibernateImpl implements DBService {
         });
     }
 
+    @Override
     public void deleteUserById(long id) {
         runInSession(session -> {
             UserDataSetDAO dao = new UserDataSetDAO(session);
@@ -79,8 +85,18 @@ public class DBServiceHibernateImpl implements DBService {
         });
     }
 
+    @Override
     public void shutdown() {
         sessionFactory.close();
+    }
+
+    @Override
+    public void clearEntity(String entityName) {
+        String stringQuery = "DELETE FROM " + entityName;
+        runInSession(session -> {
+            Query query = session.createQuery(stringQuery);
+            return query.executeUpdate();
+        });
     }
 
     private <R> R runInSession(Function<Session, R> function) {
@@ -98,4 +114,5 @@ public class DBServiceHibernateImpl implements DBService {
         ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
     }
+
 }

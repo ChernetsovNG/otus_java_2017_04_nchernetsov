@@ -3,7 +3,7 @@ package ru.otus.orm;
 import org.reflections.Reflections;
 import ru.otus.entity.User;
 import ru.otus.orm.handlers.TResultHandler;
-import ru.otus.utils.ConnectionHelper;
+import ru.otus.utils.PostgresDataSource;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,7 +26,7 @@ public class ORM implements Executor {
     private final Map<Class<?>, DataSetDescriptor> matchClassFieldsAndTablesColumnMap = new HashMap<>();
 
     ORM() {
-        connection = ConnectionHelper.getConnection();
+        connection = new PostgresDataSource().getConnection();
         prepareObjectRelationalMapping();
     }
 

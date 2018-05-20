@@ -26,6 +26,6 @@ public class ConnectionHelper {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
+
 }

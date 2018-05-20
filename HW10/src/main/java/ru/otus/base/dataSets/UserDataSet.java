@@ -33,24 +33,24 @@ public class UserDataSet extends BaseDataSet {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAddress(AddressDataSet address) {
-        this.address = address;
-    }
-
-    public void setPhones(List<PhoneDataSet> phones) {
-        this.phones = phones;
-    }
-
     public AddressDataSet getAddress() {
         return address;
     }
 
     public List<PhoneDataSet> getPhones() {
         return phones;
+    }
+
+    private void setName(String name) {
+        this.name = name;
+    }
+
+    private void setAddress(AddressDataSet address) {
+        this.address = address;
+    }
+
+    private void setPhones(List<PhoneDataSet> phones) {
+        this.phones = phones;
     }
 
     @Override
@@ -61,4 +61,5 @@ public class UserDataSet extends BaseDataSet {
             ", phones=" + phones +
             "} " + super.toString();
     }
+
 }

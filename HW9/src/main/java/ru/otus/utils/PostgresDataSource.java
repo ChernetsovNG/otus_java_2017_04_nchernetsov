@@ -4,12 +4,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectionHelper {
+public class PostgresDataSource implements DataSource {
 
-    public static Connection getConnection() {
+    static {
         try {
             DriverManager.registerDriver(new org.postgresql.Driver());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public Connection getConnection() {
+        try {
             String url = "jdbc:postgresql://" +  // db type
                 "localhost:" +               // host name
                 "5432/" +                    // port
@@ -23,7 +29,24 @@ public class ConnectionHelper {
         }
     }
 
-    static void printDBInfo() {
+    @Override
+    public Connection getConnection(String username, String password) {
+        try {
+            String url = "jdbc:postgresql://" +
+                "localhost:" +
+                "5432/" +
+                "otus_test_db?" +
+                "user=" + username + "&" +
+                "password=" + password;
+
+            return DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void printInfo() {
         try (Connection connection = getConnection()) {
             System.out.println("Connected to: " + connection.getMetaData().getURL());
             System.out.println("DB name: " + connection.getMetaData().getDatabaseProductName());
@@ -32,7 +55,6 @@ public class ConnectionHelper {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
 }

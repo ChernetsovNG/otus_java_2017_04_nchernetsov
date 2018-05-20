@@ -18,4 +18,6 @@ public interface DBService {
     void deleteUserById(long id);
 
     void shutdown();
+
+    void clearEntity(String entityName);
 }

@@ -1,5 +1,6 @@
 package ru.otus.orm;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -18,6 +19,11 @@ public class ORMTest {
     @BeforeClass
     public static void processEntityTest() throws Exception {
         orm = new ORM();
+    }
+
+    @AfterClass
+    public static void afterAll() throws SQLException {
+        orm.dispose();
     }
 
     @Before

@@ -1,9 +1,11 @@
 package ru.otus.orm;
 
 import org.reflections.Reflections;
+import ru.otus.connection.ConnectionFactory;
+import ru.otus.connection.JDBCConnectionFactory;
+import ru.otus.connection.PoolConnectionFactory;
 import ru.otus.entity.User;
 import ru.otus.orm.handlers.TResultHandler;
-import ru.otus.utils.PostgresDataSource;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +21,7 @@ import static ru.otus.utils.ReflectionHelper.instantiate;
 import static ru.otus.utils.ReflectionHelper.setFieldValue;
 
 public class ORM implements Executor {
+    private final ConnectionFactory connectionFactory;
     private final Connection connection;
     // Карта вида (Класс - Имя таблицы в БД)
     private final Map<Class<?>, String> tableNames = new HashMap<>();
@@ -26,7 +29,8 @@ public class ORM implements Executor {
     private final Map<Class<?>, DataSetDescriptor> matchClassFieldsAndTablesColumnMap = new HashMap<>();
 
     ORM() {
-        connection = new PostgresDataSource().getConnection();
+        connectionFactory = new PoolConnectionFactory(new JDBCConnectionFactory());
+        connection = connectionFactory.getConnection();
         prepareObjectRelationalMapping();
     }
 
@@ -209,6 +213,12 @@ public class ORM implements Executor {
         sb.append("FROM ").append(tableName).append(";");
 
         return sb.toString();
+    }
+
+    @Override
+    public void dispose() throws SQLException {
+        connection.close();
+        connectionFactory.dispose();
     }
 
 }

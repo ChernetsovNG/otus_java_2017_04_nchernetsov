@@ -3,7 +3,6 @@ package ru.otus.cache;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
     private static final int TIME_THRESHOLD_MS = 5;
@@ -13,6 +12,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
     private final long idleTimeMs;
     private final boolean isEternal;
 
+    // Object on soft reference will be removed while GC in out of memory situation
     private final Map<K, SoftReference<Element<K, V>>> elements = new LinkedHashMap<>();
     private final Timer timer = new Timer();
 
@@ -72,13 +72,10 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
     @Override
     public List<Element<K, V>> getAll() {
         List<Element<K, V>> result = new ArrayList<>();
-
-        Collection<SoftReference<Element<K, V>>> elementSoftReferences = elements.values();
-
-        for (SoftReference<Element<K, V>> elementSoftReference : elementSoftReferences) {
+        elements.values().forEach(softReference -> {
             Element<K, V> element;
-            if (elementSoftReference != null) {
-                element = elementSoftReference.get();
+            if (softReference != null) {
+                element = softReference.get();
             } else {
                 element = null;
             }
@@ -90,8 +87,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
             } else {
                 miss++;
             }
-        }
-
+        });
         return result;
     }
 
@@ -112,6 +108,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
 
     @Override
     public void dispose() {
+        elements.clear();
         timer.cancel();
     }
 

@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import ru.otus.base.dataSets.AddressDataSet;
 import ru.otus.base.dataSets.PhoneDataSet;
@@ -59,7 +60,7 @@ public class DBServiceHibernateImpl implements DBService {
     }
 
     public UserDataSet read(long id) {
-        // сперва ищем в кеше, если там нет, то обращаемся к базе
+        // сперва ищем объект в кеше, а если его там нет, то обращаемся к базе
         Element<Long, UserDataSet> element = cache.get(id);
 
         UserDataSet userFromCache;
@@ -136,6 +137,20 @@ public class DBServiceHibernateImpl implements DBService {
         builder.applySettings(configuration.getProperties());
         ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
+    }
+
+    @Override
+    public void clearEntity(String entityName) {
+        String stringQuery = "DELETE FROM " + entityName;
+        runInSession(session -> {
+            Query query = session.createQuery(stringQuery);
+            return query.executeUpdate();
+        });
+    }
+
+    @Override
+    public void clearCache() {
+        cache.dispose();
     }
 
     @Override

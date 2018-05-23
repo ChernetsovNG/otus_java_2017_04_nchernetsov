@@ -22,4 +22,8 @@ public interface DBService {
     void shutdown();
 
     int[] getCacheStats();
+
+    void clearEntity(String entityName);
+
+    void clearCache();
 }

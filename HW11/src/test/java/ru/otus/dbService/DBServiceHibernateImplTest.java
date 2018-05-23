@@ -5,12 +5,11 @@ import ru.otus.base.dataSets.AddressDataSet;
 import ru.otus.base.dataSets.PhoneDataSet;
 import ru.otus.base.dataSets.UserDataSet;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DBServiceHibernateImplTest {
     private static DBService dbService;
@@ -26,7 +25,7 @@ public class DBServiceHibernateImplTest {
     }
 
     @Test
-    public void saveAndReadTest() throws Exception {
+    public void saveAndReadTest() {
         UserDataSet userDataSet1 = new UserDataSet("User 1",
             new AddressDataSet("Street 1", 1),
             Collections.singletonList(new PhoneDataSet(1, "1")));
@@ -74,7 +73,7 @@ public class DBServiceHibernateImplTest {
     }
 
     @Test
-    public void readAllFromCacheTest() throws Exception {
+    public void readAllFromCacheTest() {
         UserDataSet userDataSet1 = new UserDataSet("User 1",
             new AddressDataSet("Street 1", 1),
             Collections.singletonList(new PhoneDataSet(1, "1")));

@@ -43,6 +43,6 @@ public class UserDataSetDAO {
     public void deleteUserById(long id) {
         UserDataSet user = session.load(UserDataSet.class, id);
         session.delete(user);
-        session.flush() ;
+        session.flush();
     }
 }

@@ -1,9 +1,19 @@
 package ru.otus.cache;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 public class Element<K, V> {
     private final K key;
     private final V value;
+    /**
+     * Время создания элемента, UTC, мс
+     */
     private final long creationTime;
+    /**
+     * Время последнего доступа к элементу, UTC, мс
+     */
     private long lastAccessTime;
 
     public Element(K key, V value) {
@@ -14,7 +24,7 @@ public class Element<K, V> {
     }
 
     long getCurrentTime() {
-        return System.currentTimeMillis();
+        return LocalDateTime.now(Clock.systemUTC()).toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     K getKey() {

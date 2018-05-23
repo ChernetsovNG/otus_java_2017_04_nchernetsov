@@ -56,6 +56,9 @@ n.chernetsov86@gmail.com
 
 * HW11
 
+Самописный CacheEngine на основе SoftReference, с evict элементов по времени жизни и 
+по времени последнего обращения
+
 * HW12
 
 * HW13

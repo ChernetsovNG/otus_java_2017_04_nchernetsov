@@ -1,7 +1,5 @@
 package ru.otus.servlet;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AuthServlet extends HttpServlet {
-    public static final String LOGIN_PARAMETER_NAME = "login";
+    static final String LOGIN_PARAMETER_NAME = "login";
     private static final String LOGIN_VARIABLE_NAME = "login";
-    public static final String PASSWORD_PARAMETER_NAME = "password";
+    static final String PASSWORD_PARAMETER_NAME = "password";
     private static final String PASSWORD_VARIABLE_NAME = "password";
 
     private static final String AUTHORIZATION_PAGE_TEMPLATE = "auth.html";
@@ -20,18 +18,20 @@ public class AuthServlet extends HttpServlet {
     private String login;
     private String password;
 
-    public AuthServlet(String login, String password) {
+    AuthServlet(String login, String password) {
         this.login = login;
         this.password = password;
     }
 
+    @Override
     public void doGet(HttpServletRequest request,
-                      HttpServletResponse response) throws ServletException, IOException {
+                      HttpServletResponse response) throws IOException {
         doPost(request, response);
     }
 
+    @Override
     public void doPost(HttpServletRequest request,
-                       HttpServletResponse response) throws ServletException, IOException {
+                       HttpServletResponse response) throws IOException {
         String requestLogin = request.getParameter(LOGIN_PARAMETER_NAME);
         String requestPassword = request.getParameter(PASSWORD_PARAMETER_NAME);
 

@@ -2,7 +2,6 @@ package ru.otus.servlet;
 
 import ru.otus.dbService.DBService;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,14 +19,16 @@ public class CacheInfoServlet extends HttpServlet {
     private static final String HARDCODED_LOGIN = "admin";
     private static final String HARDCODED_PASSWORD = "12345";
 
+    private static final DateFormat formatter = new SimpleDateFormat("HH.mm.ss");
+
     private DBService dbService;
 
-    public CacheInfoServlet(DBService dbService) {
+    CacheInfoServlet(DBService dbService) {
         this.dbService = dbService;
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Map<String, Object> pageVariables = createCacheVariablesMap();
         pageVariables.put("time", getTime());
 
@@ -37,8 +38,9 @@ public class CacheInfoServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
+    @Override
     public void doPost(HttpServletRequest request,
-                       HttpServletResponse response) throws ServletException, IOException {
+                       HttpServletResponse response) throws IOException {
         String login = request.getParameter(AuthServlet.LOGIN_PARAMETER_NAME);
         String password = request.getParameter(AuthServlet.PASSWORD_PARAMETER_NAME);
 
@@ -71,10 +73,7 @@ public class CacheInfoServlet extends HttpServlet {
     }
 
     private static String getTime() {
-        Date date = new Date();
-        date.getTime();
-        DateFormat formatter = new SimpleDateFormat("HH.mm.ss");
-        return formatter.format(date);
+        return formatter.format(new Date());
     }
 
 }

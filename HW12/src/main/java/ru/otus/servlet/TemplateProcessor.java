@@ -11,7 +11,7 @@ import java.io.Writer;
 import java.util.Map;
 
 class TemplateProcessor {
-    private static final String HTML_DIR = "HW12/tml";
+    private static final String HTML_DIR = "tml";
     private static TemplateProcessor instance = new TemplateProcessor();
 
     private final Configuration configuration;

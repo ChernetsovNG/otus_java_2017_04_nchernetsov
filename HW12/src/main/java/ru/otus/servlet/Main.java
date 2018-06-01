@@ -15,7 +15,7 @@ import java.util.Collections;
 
 public class Main {
     private final static int PORT = 8090;
-    private final static String PUBLIC_HTML = "HW12/public_html";
+    private final static String PUBLIC_HTML = "public_html";
 
     public static void main(String[] args) throws Exception {
         ResourceHandler resourceHandler = new ResourceHandler();

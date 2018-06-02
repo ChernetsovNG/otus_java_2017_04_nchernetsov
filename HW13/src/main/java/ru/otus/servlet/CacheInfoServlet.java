@@ -49,7 +49,7 @@ public class CacheInfoServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Map<String, Object> pageVariables = cacheInfoService.createCacheVariablesMap();
         pageVariables.put("time", cacheInfoService.getTime());
 
@@ -59,8 +59,7 @@ public class CacheInfoServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
-    public void doPost(HttpServletRequest request,
-                       HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String login = request.getParameter(AuthServlet.LOGIN_PARAMETER_NAME);
         String password = request.getParameter(AuthServlet.PASSWORD_PARAMETER_NAME);
 
